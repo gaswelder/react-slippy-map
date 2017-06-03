@@ -1,0 +1,166 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+// Length a map tile's side in pixels
+const TileSize = 256;
+
+import {getX, getY, getLat, getLon} from './mercator';
+
+
+export default class Component extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			dragging: false,
+			prevDragPos: [0, 0]
+		};
+
+		let b = ['onDragStart', 'onDrag', 'onDragEnd', 'onClick'];
+		for(let k of b) {
+			this[k] = this[k].bind(this);
+		}
+	}
+
+	halfSize() {
+		console.log(this._container);
+		//console.log(this._container.offsetWidth);
+		return [300, 200];
+	}
+
+	onClick(event) {
+		let x = event.pageX - this._container.offsetLeft;
+		let y = event.pageY - this._container.offsetTop;
+		console.log(x, y);
+	}
+
+	onDragStart(event) {
+		this.setState({
+			dragging: true,
+			prevDragPos: [event.pageX, event.pageY]
+		});
+	}
+
+	onDrag(event) {
+		if(!this.state.dragging) return;
+
+		let x = event.pageX;
+		let y = event.pageY;
+
+		this.setState(function(s) {
+			let dx = x - s.prevDragPos[0];
+			let dy = y - s.prevDragPos[1];
+
+
+
+			let lat1 = this.props.center.latitude;
+			let lon1 = this.props.center.longitude;
+			let zoom = this.props.zoom;
+
+			let lat2 = getLat(getY(lat1, zoom) - dy, zoom);
+			let lon2 = getLon(getX(lon1, zoom) - dx, zoom);
+
+			//console.log(dx, dy, lat1, lat2);
+
+			this.props.onCenterChange({latitude: lat2, longitude: lon2});
+
+			return {prevDragPos: [x, y]};
+		});
+	}
+
+	onDragEnd(event) {
+		this.setState({dragging: false});
+	}
+
+	shouldComponentUpdate(prevProps, prevState) {
+		//console.log(prevProps, prevState);
+		return true;
+	}
+
+	/*
+	 * Returns index ranges of tiles required
+	 * to cover our current container area.
+	 */
+	getTilesRange() {
+		let zoom = this.props.zoom;
+		let lat = this.props.center.latitude;
+		let lon = this.props.center.longitude;
+
+		// Determine where our center is on the projection surface.
+		let x = getX(lon, zoom);
+		let y = getY(lat, zoom);
+
+		let [w, h] = this.halfSize();
+
+		let i1 = Math.floor((x-w) / TileSize);
+		let i2 = Math.floor((x+w) / TileSize);
+		let j1 = Math.floor((y-h) / TileSize);
+		let j2 = Math.floor((y+h) / TileSize);
+
+		return [i1, i2, j1, j2];
+	}
+
+	render() {
+		let zoom = this.props.zoom;
+		let lat = this.props.center.latitude;
+		let lon = this.props.center.longitude;
+
+		// Determine the range of tiles we have to get
+		// to cover our area.
+		let [i1, i2, j1, j2] = this.getTilesRange();
+
+		let tiles = [];
+
+		let x0 = i1 * 256;
+		let y0 = j1 * 256;
+
+		for(let i = i1; i <= i2; i++) {
+			for(let j = j1; j <= j2; j++) {
+				let url = `https://a.tile.openstreetmap.org/${zoom}/${i}/${j}.png`;
+				let x = i * 256 - x0;
+				let y = j * 256 - y0;
+				let style = {
+					position: 'absolute',
+					left: x + 'px',
+					top: y + 'px'
+				};
+				tiles.push(
+					<img key={url} src={url} style={style} alt=""/>
+				)
+			}
+		}
+
+		let style = {
+			width: '600px',
+			height: '400px',
+			border: 'thin solid red',
+			position: 'relative',
+			overflow: 'hidden'
+		};
+
+		let [w, h] = this.halfSize();
+
+		let left = w - (getX(lon, zoom) - x0);
+		let top = h - (getY(lat, zoom) - y0);
+
+		return (
+			<div style={style} ref={ref => this._container = ref}>
+				<div style={{position: 'absolute', left: left + 'px', top: top + 'px'}}
+					onDragStart={e => e.preventDefault()}
+					onMouseDown={this.onDragStart}
+					onMouseMove={this.onDrag}
+					onMouseUp={this.onDragEnd}
+					onClick={this.onClick}
+				>
+					{tiles}
+				</div>
+			</div>
+		);
+	}
+}
+
+Component.defaultProps = {
+	zoom: 16,
+	center: {latitude: 53.9049, longitude: 27.5609},
+	onCenterChange: x => x
+};
