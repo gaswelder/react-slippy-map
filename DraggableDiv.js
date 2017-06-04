@@ -7,8 +7,9 @@ export default class DraggableDiv extends React.Component {
 		super(props);
 
 		this.state = {
-			prevDragPos: [0, 0],
-			mouseDown: false
+			prevMousePos: [0, 0],
+			mouseDown: false,
+			dragStarted: false
 		};
 
 		this.onMouseDown = this.onMouseDown.bind(this);
@@ -20,31 +21,53 @@ export default class DraggableDiv extends React.Component {
 	onMouseDown(event) {
 		this.setState({
 			mouseDown: true,
-			prevDragPos: [event.pageX, event.pageY]
+			dragStarted: false,
+			prevMousePos: [event.pageX, event.pageY]
 		});
 	}
 
-	onMouseUp() {
+	onMouseUp(event) {
 		this.setState({mouseDown: false});
 	}
 
 	onMouseMove(event) {
-		if (!this.state.mouseDown) {
+		let s = this.state;
+
+		if (!s.mouseDown) {
 			return;
 		}
 
 		let x = event.pageX;
 		let y = event.pageY;
-		let dx = x - this.state.prevDragPos[0];
-		let dy = y - this.state.prevDragPos[1];
+		let dx = x - s.prevMousePos[0];
+		let dy = y - s.prevMousePos[1];
 
-		this.props.onMove({dx, dy});
-		this.setState({
-			prevDragPos: [x, y]
-		});
+		// Mousemove can occur during a legitimate click too.
+		// To account for that we let some limited mousemove
+		// before considering the gesture as a dragging.
+
+		// If this is a dragging, call the onMove handler
+		// and update our pixel tracking.
+		if (s.dragStarted) {
+			this.props.onMove({dx, dy});
+			this.setState({
+				prevMousePos: [x, y]
+			});
+		}
+		// If the "gesture" is not yet qualified as dragging,
+		// see if it already qualifies by looking if the mouse
+		// has travalled far enough.
+		else {
+			if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
+				this.setState({dragStarted: true});
+			}
+		}
 	}
 
 	onClick(event) {
+		if (this.state.dragStarted) {
+			return;
+		}
 		this.props.onClick(event);
 	}
 
