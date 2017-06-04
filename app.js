@@ -10,7 +10,7 @@ class Test extends React.Component {
 			lon: 27.5609,
 			zoom: 16
 		};
-		let b = ['left', 'right', 'in', 'out', 'onCenterChange'];
+		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick'];
 		for(let k of b) {
 			this[k] = this[k].bind(this);
 		}
@@ -41,6 +41,10 @@ class Test extends React.Component {
 	out() { this.diff('zoom', -1); }
 	in() { this.diff('zoom', 1); }
 
+	onClick(arg) {
+		console.log('click', arg);
+	}
+
 	render() {
 		let center = {
 			latitude: this.state.lat,
@@ -48,7 +52,12 @@ class Test extends React.Component {
 		};
 		return (
 			<div>
-				<Component center={center} zoom={this.state.zoom} onCenterChange={this.onCenterChange}/>
+				<Component
+					center={center}
+					zoom={this.state.zoom}
+					onCenterChange={this.onCenterChange}
+					onClick={this.onClick}
+					/>
 				<div>
 					<button onClick={this.left}>Left</button>
 					<button onClick={this.right}>Right</button>

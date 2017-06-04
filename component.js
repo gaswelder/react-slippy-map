@@ -33,7 +33,25 @@ export default class Component extends React.Component {
 	onClick(event) {
 		let x = event.pageX - this._container.offsetLeft;
 		let y = event.pageY - this._container.offsetTop;
-		//console.log(x, y);
+
+		// Get coordinates of our center on the projection cylinder.
+		let lat1 = this.props.center.latitude;
+		let lon1 = this.props.center.longitude;
+		let zoom = this.props.zoom;
+		let mx = getX(lon1, zoom);
+		let my = getY(lat1, zoom);
+
+		// Find out click offset from the center.
+		let [w, h] = this.halfSize();
+		let dx = x - w;
+		let dy = y - h;
+
+		// Apply the offset to the projection coordinates and get the
+		// corresponding latitude and longitude.
+		let lat2 = getLat(my + dy, zoom);
+		let lon2 = getLon(mx + dx, zoom);
+
+		this.props.onClick({latitude: lat2, longitude: lon2});
 	}
 
 	onDragStart(event) {
@@ -176,8 +194,11 @@ export default class Component extends React.Component {
 	}
 }
 
+function noop() {}
+
 Component.defaultProps = {
 	zoom: 16,
 	center: {latitude: 53.9049, longitude: 27.5609},
-	onCenterChange: x => x
+	onCenterChange: noop,
+	onClick: noop
 };
