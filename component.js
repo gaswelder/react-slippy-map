@@ -121,8 +121,7 @@ export default class Component extends React.Component {
 				let y = j * 256 - y0;
 				let style = {
 					position: 'absolute',
-					left: x + 'px',
-					top: y + 'px'
+					transform: `translate3d(${x}px, ${y}px, 0px)`
 				};
 				tiles.push(
 					<img key={url} src={url} style={style} alt=""/>
@@ -139,13 +138,17 @@ export default class Component extends React.Component {
 		};
 
 		let [w, h] = this.halfSize();
-
 		let left = w - (getX(lon, zoom) - x0);
 		let top = h - (getY(lat, zoom) - y0);
 
+		let layerStyle = {
+			position: 'absolute',
+			transform: `translate3d(${left}px, ${top}px, 0px)`
+		};
+
 		return (
 			<div style={style} ref={ref => this._container = ref}>
-				<div style={{position: 'absolute', left: left + 'px', top: top + 'px'}}
+				<div style={layerStyle}
 					onDragStart={e => e.preventDefault()}
 					onMouseDown={this.onDragStart}
 					onMouseMove={this.onDrag}
