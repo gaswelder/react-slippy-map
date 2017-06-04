@@ -13,7 +13,8 @@ export default class Component extends React.Component {
 
 		this.state = {
 			dragging: false,
-			prevDragPos: [0, 0]
+			prevDragPos: [0, 0],
+			containerSize: [0, 0]
 		};
 
 		let b = ['onDragStart', 'onDrag', 'onDragEnd', 'onClick'];
@@ -22,16 +23,17 @@ export default class Component extends React.Component {
 		}
 	}
 
+	/*
+	 * Returns halved width and height of the container.
+	 */
 	halfSize() {
-		console.log(this._container);
-		//console.log(this._container.offsetWidth);
-		return [300, 200];
+		return [this.state.containerSize[0]/2, this.state.containerSize[1]/2];
 	}
 
 	onClick(event) {
 		let x = event.pageX - this._container.offsetLeft;
 		let y = event.pageY - this._container.offsetTop;
-		console.log(x, y);
+		//console.log(x, y);
 	}
 
 	onDragStart(event) {
@@ -101,6 +103,29 @@ export default class Component extends React.Component {
 	}
 
 	render() {
+		let style = {
+			width: '600px',
+			height: '400px',
+			border: 'thin solid red',
+			position: 'relative',
+			overflow: 'hidden'
+		};
+
+		return (
+			<div style={style} ref={ref => this._container = ref}>
+				{this._container && this.renderLayer()}
+			</div>
+		);
+	}
+
+	componentDidMount() {
+		let c = this._container;
+		this.setState({
+			containerSize: [c.offsetWidth, c.offsetHeight]
+		});
+	}
+
+	renderLayer() {
 		let zoom = this.props.zoom;
 		let lat = this.props.center.latitude;
 		let lon = this.props.center.longitude;
@@ -129,14 +154,6 @@ export default class Component extends React.Component {
 			}
 		}
 
-		let style = {
-			width: '600px',
-			height: '400px',
-			border: 'thin solid red',
-			position: 'relative',
-			overflow: 'hidden'
-		};
-
 		let [w, h] = this.halfSize();
 		let left = w - (getX(lon, zoom) - x0);
 		let top = h - (getY(lat, zoom) - y0);
@@ -147,16 +164,13 @@ export default class Component extends React.Component {
 		};
 
 		return (
-			<div style={style} ref={ref => this._container = ref}>
-				<div style={layerStyle}
-					onDragStart={e => e.preventDefault()}
-					onMouseDown={this.onDragStart}
-					onMouseMove={this.onDrag}
-					onMouseUp={this.onDragEnd}
-					onClick={this.onClick}
-				>
-					{tiles}
-				</div>
+			<div style={layerStyle}
+				onDragStart={e => e.preventDefault()}
+				onMouseDown={this.onDragStart}
+				onMouseMove={this.onDrag}
+				onMouseUp={this.onDragEnd}
+				onClick={this.onClick}>
+				{tiles}
 			</div>
 		);
 	}
