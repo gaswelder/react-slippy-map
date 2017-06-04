@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Component from './component';
+import {Marker} from './component';
 
 class Test extends React.Component {
 	constructor(props) {
@@ -8,7 +9,8 @@ class Test extends React.Component {
 		this.state = {
 			lat: 53.9049,
 			lon: 27.5609,
-			zoom: 16
+			zoom: 16,
+			markers: []
 		};
 		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick'];
 		for(let k of b) {
@@ -42,7 +44,9 @@ class Test extends React.Component {
 	in() { this.diff('zoom', 1); }
 
 	onClick(arg) {
-		console.log('click', arg);
+		this.setState(function(s) {
+			return {markers: s.markers.concat(arg)};
+		});
 	}
 
 	render() {
@@ -56,8 +60,11 @@ class Test extends React.Component {
 					center={center}
 					zoom={this.state.zoom}
 					onCenterChange={this.onCenterChange}
-					onClick={this.onClick}
-					/>
+					onClick={this.onClick}>
+
+					{this.state.markers.map((pos, i) => <Marker key={i} pos={pos}/>)}
+
+				</Component>
 				<div>
 					<button onClick={this.left}>Left</button>
 					<button onClick={this.right}>Right</button>

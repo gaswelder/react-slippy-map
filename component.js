@@ -132,6 +132,7 @@ export default class Component extends React.Component {
 		return (
 			<div style={style} ref={ref => this._container = ref}>
 				{this._container && this.renderLayer()}
+				{this._container && this.renderChildren()}
 			</div>
 		);
 	}
@@ -192,6 +193,38 @@ export default class Component extends React.Component {
 			</div>
 		);
 	}
+
+	renderChildren() {
+		return React.Children.map(this.props.children, this.renderChild.bind(this));
+	}
+
+	renderChild(child) {
+		let zoom = this.props.zoom;
+
+		// Get location of our center on the projection
+		let px = getX(this.props.center.longitude, zoom);
+		let py = getY(this.props.center.latitude, zoom);
+
+		// Get location of the child on the projection
+		let cx = getX(child.props.pos.longitude, zoom);
+		let cy = getY(child.props.pos.latitude, zoom);
+
+		// Get the difference
+		let dx = cx - px;
+		let dy = cy - py;
+
+		let [w, h] = this.halfSize();
+		let x = w + dx;
+		let y = h + dy;
+
+		let style = {
+			position: 'absolute',
+			transform: `translate3d(${x}px, ${y}px, 0px)`
+		};
+		return (
+			<div style={style}>{child}</div>
+		);
+	}
 }
 
 function noop() {}
@@ -202,3 +235,16 @@ Component.defaultProps = {
 	onCenterChange: noop,
 	onClick: noop
 };
+
+export function Marker(props) {
+	let style = {
+		background: 'url("marker-icon-2x.png")',
+		width: '50px',
+		height: '82px',
+		transform: 'translate3d(-25px, -62px, 0px) scale(0.5)'
+	};
+
+	return (
+		<div style={style}/>
+	);
+}
