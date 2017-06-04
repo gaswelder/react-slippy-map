@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 const TileSize = 256;
 
 import {getX, getY, getLat, getLon} from './mercator';
+import DraggableDiv from './DraggableDiv';
 
 
 export default class Component extends React.Component {
@@ -12,15 +13,11 @@ export default class Component extends React.Component {
 		super(props);
 
 		this.state = {
-			dragging: false,
-			prevDragPos: [0, 0],
 			containerSize: [0, 0]
 		};
 
-		let b = ['onDragStart', 'onDrag', 'onDragEnd', 'onClick'];
-		for(let k of b) {
-			this[k] = this[k].bind(this);
-		}
+		this.onClick = this.onClick.bind(this);
+		this.onDrag = this.onDrag.bind(this);
 	}
 
 	/*
@@ -54,47 +51,13 @@ export default class Component extends React.Component {
 		this.props.onClick({latitude: lat2, longitude: lon2});
 	}
 
-	onDragStart(event) {
-		this.setState({
-			dragging: true,
-			prevDragPos: [event.pageX, event.pageY]
-		});
-	}
-
 	onDrag(event) {
-		if(!this.state.dragging) return;
-
-		let x = event.pageX;
-		let y = event.pageY;
-
-		this.setState(function(s) {
-			let dx = x - s.prevDragPos[0];
-			let dy = y - s.prevDragPos[1];
-
-
-
-			let lat1 = this.props.center.latitude;
-			let lon1 = this.props.center.longitude;
-			let zoom = this.props.zoom;
-
-			let lat2 = getLat(getY(lat1, zoom) - dy, zoom);
-			let lon2 = getLon(getX(lon1, zoom) - dx, zoom);
-
-			//console.log(dx, dy, lat1, lat2);
-
-			this.props.onCenterChange({latitude: lat2, longitude: lon2});
-
-			return {prevDragPos: [x, y]};
-		});
-	}
-
-	onDragEnd(event) {
-		this.setState({dragging: false});
-	}
-
-	shouldComponentUpdate(prevProps, prevState) {
-		//console.log(prevProps, prevState);
-		return true;
+		let zoom = this.props.zoom;
+		let lat1 = this.props.center.latitude;
+		let lon1 = this.props.center.longitude;
+		let lat2 = getLat(getY(lat1, zoom) - event.dy, zoom);
+		let lon2 = getLon(getX(lon1, zoom) - event.dx, zoom);
+		this.props.onCenterChange({latitude: lat2, longitude: lon2});
 	}
 
 	/*
@@ -183,14 +146,9 @@ export default class Component extends React.Component {
 		};
 
 		return (
-			<div style={layerStyle}
-				onDragStart={e => e.preventDefault()}
-				onMouseDown={this.onDragStart}
-				onMouseMove={this.onDrag}
-				onMouseUp={this.onDragEnd}
-				onClick={this.onClick}>
+			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
 				{tiles}
-			</div>
+			</DraggableDiv>
 		);
 	}
 
