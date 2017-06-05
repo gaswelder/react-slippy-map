@@ -104,8 +104,7 @@ export default class Component extends React.Component {
 
 	render() {
 		let style = {
-			width: '600px',
-			height: '400px',
+			height: '500px',
 			border: 'thin solid red',
 			position: 'relative',
 			overflow: 'hidden'

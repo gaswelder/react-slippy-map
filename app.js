@@ -3,6 +3,21 @@ import ReactDOM from 'react-dom';
 import Component from './component';
 import {Marker} from './component';
 
+function randomPos() {
+	return {
+		latitude: 53.9049 + (Math.random()-0.5) * 0.01,
+		longitude: 27.5609 + (Math.random()-0.5) * 0.01
+	};
+}
+
+function gen(size, func) {
+	let r = [];
+	for(let i = 0; i < size; i++) {
+		r.push(func());
+	}
+	return r;
+}
+
 class Test extends React.Component {
 	constructor(props) {
 		super(props);
@@ -10,7 +25,7 @@ class Test extends React.Component {
 			lat: 53.9049,
 			lon: 27.5609,
 			zoom: 16,
-			markers: []
+			markers: gen(100, randomPos)
 		};
 		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick'];
 		for(let k of b) {
