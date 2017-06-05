@@ -44,6 +44,25 @@ export default class Component extends React.Component {
 		};
 	}
 
+	// Returns offset [x,y] in pixels from the current map center
+	// corresponding to the given coordinates.
+	offsetAtCoordinates({latitude, longitude}) {
+		let zoom = this.props.zoom;
+
+		// Get location of our center on the projection
+		let px = getX(this.props.center.longitude, zoom);
+		let py = getY(this.props.center.latitude, zoom);
+
+		// Get location of the given point on the projection
+		let cx = getX(longitude, zoom);
+		let cy = getY(latitude, zoom);
+
+		// Get the difference
+		let dx = cx - px;
+		let dy = cy - py;
+		return [dx, dy];
+	}
+
 	onClick(event) {
 		// Find out click offset from the center.
 		let x = event.pageX - this._container.offsetLeft;
@@ -156,21 +175,10 @@ export default class Component extends React.Component {
 		return React.Children.map(this.props.children, this.renderChild.bind(this));
 	}
 
+
+
 	renderChild(child) {
-		let zoom = this.props.zoom;
-
-		// Get location of our center on the projection
-		let px = getX(this.props.center.longitude, zoom);
-		let py = getY(this.props.center.latitude, zoom);
-
-		// Get location of the child on the projection
-		let cx = getX(child.props.pos.longitude, zoom);
-		let cy = getY(child.props.pos.latitude, zoom);
-
-		// Get the difference
-		let dx = cx - px;
-		let dy = cy - py;
-
+		let [dx, dy] = this.offsetAtCoordinates(child.props.pos);
 		let [w, h] = this.halfSize();
 		let x = w + dx;
 		let y = h + dy;
