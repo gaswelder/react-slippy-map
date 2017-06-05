@@ -136,8 +136,8 @@ export default class Component extends React.Component {
 
 		let tiles = [];
 
-		let x0 = i1 * 256;
-		let y0 = j1 * 256;
+		let x0 = 9672448;
+		let y0 = 5393920;
 
 		for(let i = i1; i <= i2; i++) {
 			for(let j = j1; j <= j2; j++) {
@@ -146,7 +146,7 @@ export default class Component extends React.Component {
 				let y = j * 256 - y0;
 				let style = {
 					position: 'absolute',
-					transform: `translate3d(${x}px, ${y}px, 0px)`
+					transform: `translate(${x}px, ${y}px)`
 				};
 				tiles.push(
 					<img key={url} src={url} style={style} alt=""/>
@@ -163,32 +163,37 @@ export default class Component extends React.Component {
 			transform: `translate3d(${left}px, ${top}px, 0px)`
 		};
 
+		let markers = React.Children.map(this.props.children, child => {
+			let [dx, dy] = this.offsetAtCoordinates(child.props.pos);
+			let [w, h] = this.halfSize();
+			let x = w + dx - left;
+			let y = h + dy - top;
+
+			let style = {
+				position: 'absolute',
+				transform: `translate(${x}px, ${y}px)`,
+				transition: 'transform 0.1s'
+			};
+			return (
+				<div style={style}>{child}</div>
+			);
+		});
+
 		return (
 			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
-				{tiles}
+				<div>{tiles}</div>
+				<div>{markers}</div>
 			</DraggableDiv>
 		);
 	}
 
 	renderChildren() {
-		return React.Children.map(this.props.children, this.renderChild.bind(this));
+		return null;
+		//return React.Children.map(this.props.children, this.renderChild.bind(this));
 	}
 
-
-
 	renderChild(child) {
-		let [dx, dy] = this.offsetAtCoordinates(child.props.pos);
-		let [w, h] = this.halfSize();
-		let x = w + dx;
-		let y = h + dy;
 
-		let style = {
-			position: 'absolute',
-			transform: `translate3d(${x}px, ${y}px, 0px)`
-		};
-		return (
-			<div style={style}>{child}</div>
-		);
 	}
 }
 
