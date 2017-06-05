@@ -18,6 +18,13 @@ class Test extends React.Component {
 		}
 	}
 
+	// componentDidMount() {
+	// 	let s = new Swarm();
+	// 	s.subscribe(markers => {
+	// 		this.setState({markers});
+	// 	})
+	// }
+
 	onCenterChange(coords) {
 		this.setState({
 			lat: coords.latitude,
