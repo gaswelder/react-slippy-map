@@ -196,10 +196,12 @@ Component.defaultProps = {
 
 export function Marker(props) {
 	let style = {
-		background: 'url("marker-icon-2x.png")',
-		width: '50px',
-		height: '82px',
-		transform: 'translate3d(-25px, -62px, 0px) scale(0.5)'
+		background: '#0091ffe6',
+		width: '16px',
+		height: '16px',
+		borderRadius: '50%',
+		boxShadow: '0px 2px 2px #023',
+		transform: 'translate(-8px, -8px)'
 	};
 
 	return (
