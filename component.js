@@ -27,37 +27,37 @@ export default class Component extends React.Component {
 		return [this.state.containerSize[0]/2, this.state.containerSize[1]/2];
 	}
 
-	onClick(event) {
-		let x = event.pageX - this._container.offsetLeft;
-		let y = event.pageY - this._container.offsetTop;
-
+	// Returns latitude and longitude corresponding to the point
+	// at [x,y] pixels from the current map center.
+	coordinatesAtOffset(x, y) {
 		// Get coordinates of our center on the projection cylinder.
 		let lat1 = this.props.center.latitude;
 		let lon1 = this.props.center.longitude;
 		let zoom = this.props.zoom;
 		let mx = getX(lon1, zoom);
 		let my = getY(lat1, zoom);
+		// Apply the offset to the projection coordinates and get the
+		// corresponding latitude and longitude.
+		return {
+			latitude: getLat(my + y, zoom),
+			longitude: getLon(mx + x, zoom)
+		};
+	}
 
+	onClick(event) {
 		// Find out click offset from the center.
+		let x = event.pageX - this._container.offsetLeft;
+		let y = event.pageY - this._container.offsetTop;
 		let [w, h] = this.halfSize();
 		let dx = x - w;
 		let dy = y - h;
-
-		// Apply the offset to the projection coordinates and get the
-		// corresponding latitude and longitude.
-		let lat2 = getLat(my + dy, zoom);
-		let lon2 = getLon(mx + dx, zoom);
-
-		this.props.onClick({latitude: lat2, longitude: lon2});
+		let clickCoords = this.coordinatesAtOffset(dx, dy);
+		this.props.onClick(clickCoords);
 	}
 
 	onDrag(event) {
-		let zoom = this.props.zoom;
-		let lat1 = this.props.center.latitude;
-		let lon1 = this.props.center.longitude;
-		let lat2 = getLat(getY(lat1, zoom) - event.dy, zoom);
-		let lon2 = getLon(getX(lon1, zoom) - event.dx, zoom);
-		this.props.onCenterChange({latitude: lat2, longitude: lon2});
+		let newCenterCoords = this.coordinatesAtOffset(-event.dx, -event.dy);
+		this.props.onCenterChange(newCenterCoords);
 	}
 
 	/*
