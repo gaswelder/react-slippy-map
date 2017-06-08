@@ -18,6 +18,18 @@ function gen(size, func) {
 	return r;
 }
 
+const pointsSource = {
+	all: [],
+
+	get(n) {
+		let m = n - this.all.length;
+		if(m > 0) {
+			this.all = this.all.concat(gen(m, randomPos));
+		}
+		return this.all.slice(0, n);
+	}
+};
+
 class Test extends React.Component {
 	constructor(props) {
 		super(props);
@@ -25,11 +37,11 @@ class Test extends React.Component {
 			lat: 53.9049,
 			lon: 27.5609,
 			zoom: 16,
-			markers: gen(100, randomPos),
+			markersNumber: 10,
 			notes: [],
 			clusterThreshold: 10
 		};
-		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick', 'setClusterThreshold'];
+		let b = ['onCenterChange', 'onClick', 'setClusterThreshold', 'setMarkersNumber', 'setZoom'];
 		for(let k of b) {
 			this[k] = this[k].bind(this);
 		}
@@ -50,26 +62,17 @@ class Test extends React.Component {
 		//console.log(coords);
 	}
 
-	left() {
-		this.diff('lon', -0.001);
-	}
-
-	right() {
-		this.diff('lon', 0.001);
-	}
-
 	setClusterThreshold(e) {
 		this.setState({clusterThreshold: e.target.value});
 	}
 
-	diff(key, delta) {
-		this.setState(function(s) {
-			return {[key]: s[key] + delta};
-		});
+	setMarkersNumber(e) {
+		this.setState({markersNumber: e.target.value});
 	}
 
-	out() { this.diff('zoom', -1); }
-	in() { this.diff('zoom', 1); }
+	setZoom(e) {
+		this.setState({zoom: e.target.value});
+	}
 
 	onClick(pos) {
 		let note = {pos, text: JSON.stringify(pos)};
@@ -83,6 +86,8 @@ class Test extends React.Component {
 			latitude: this.state.lat,
 			longitude: this.state.lon
 		};
+
+		let markers = pointsSource.get(this.state.markersNumber);
 		return (
 			<div>
 				<Component
@@ -92,23 +97,33 @@ class Test extends React.Component {
 					onCenterChange={this.onCenterChange}
 					onClick={this.onClick}>
 
-					{this.state.markers.map((pos, i) => <Marker key={i} pos={pos}/>)}
+					{markers.map((pos, i) => <Marker key={i} pos={pos}/>)}
 					{this.state.notes.map((note, i) => <Pin key={'note-'+i} pos={note.pos}>{note.text}</Pin>)}
 				</Component>
 				<div>
-					<button onClick={this.left}>Left</button>
-					<button onClick={this.right}>Right</button>
-					<button onClick={this.out}>-</button>
-					<button onClick={this.in}>+</button>
+					<label>Zoom</label>
+					<Range max={22} onChange={this.setZoom} value={this.state.zoom}/>
+				</div>
+				<div>
+					<label>Number of markers</label>
+					<Range max={500} onChange={this.setMarkersNumber} value={this.state.markersNumber}/>
 				</div>
 				<div>
 					<label>Clustering</label>
-					<input type="range" min="0" max="50" onChange={this.setClusterThreshold} value={this.state.clusterThreshold}/>
-					<span>{this.state.clusterThreshold}</span>
+					<Range max={50} onChange={this.setClusterThreshold} value={this.state.clusterThreshold}/>
 				</div>
 			</div>
 		);
 	}
+}
+
+function Range(props) {
+	return (
+		<div>
+			<input type="range" min="0" max={props.max} onChange={props.onChange} value={props.value}/>
+			<span>{props.value}</span>
+		</div>
+	);
 }
 
 let container = document.createElement('div');
