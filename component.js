@@ -42,6 +42,13 @@ export default class Component extends React.Component {
 		this.onDrag = this.onDrag.bind(this);
 	}
 
+	componentDidMount() {
+		let c = this._container;
+		this.setState({
+			containerSize: [c.offsetWidth, c.offsetHeight]
+		});
+	}
+
 	/*
 	 * Returns halved width and height of the container.
 	 */
@@ -112,16 +119,8 @@ export default class Component extends React.Component {
 		return (
 			<div style={style} ref={ref => this._container = ref}>
 				{this._container && this.renderLayer()}
-				{this._container && this.renderChildren()}
 			</div>
 		);
-	}
-
-	componentDidMount() {
-		let c = this._container;
-		this.setState({
-			containerSize: [c.offsetWidth, c.offsetHeight]
-		});
 	}
 
 	renderLayer() {
@@ -207,15 +206,6 @@ export default class Component extends React.Component {
 				<div>{markers}</div>
 			</DraggableDiv>
 		);
-	}
-
-	renderChildren() {
-		return null;
-		//return React.Children.map(this.props.children, this.renderChild.bind(this));
-	}
-
-	renderChild(child) {
-
 	}
 }
 
