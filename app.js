@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Component from './component';
-import {Marker} from './component';
+import {Marker, Pin} from './component';
 
 function randomPos() {
 	return {
@@ -26,6 +26,7 @@ class Test extends React.Component {
 			lon: 27.5609,
 			zoom: 16,
 			markers: gen(100, randomPos),
+			notes: [],
 			clusterThreshold: 10
 		};
 		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick', 'setClusterThreshold'];
@@ -70,9 +71,10 @@ class Test extends React.Component {
 	out() { this.diff('zoom', -1); }
 	in() { this.diff('zoom', 1); }
 
-	onClick(arg) {
+	onClick(pos) {
+		let note = {pos, text: JSON.stringify(pos)};
 		this.setState(function(s) {
-			return {markers: s.markers.concat(arg)};
+			return {notes: s.notes.concat(note)};
 		});
 	}
 
@@ -91,7 +93,7 @@ class Test extends React.Component {
 					onClick={this.onClick}>
 
 					{this.state.markers.map((pos, i) => <Marker key={i} pos={pos}/>)}
-
+					{this.state.notes.map((note, i) => <Pin key={'note-'+i} pos={note.pos}>{note.text}</Pin>)}
 				</Component>
 				<div>
 					<button onClick={this.left}>Left</button>

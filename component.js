@@ -156,7 +156,9 @@ export default class Component extends React.Component {
 			transform: `translate3d(${left}px, ${top}px, 0px)`
 		};
 
-		let markers = React.Children.toArray(this.props.children);
+		let children = React.Children.toArray(this.props.children);
+		let markers = children.filter(c => c.type == Marker);
+		let pins = children.filter(c => c.type == Pin);
 
 
 		// If clustering is turned on, convert the given list of markers
@@ -185,7 +187,7 @@ export default class Component extends React.Component {
 				});
 		}
 
-		markers = markers.map((child, i) => {
+		let objects = pins.concat(markers).map((child, i) => {
 			let [dx, dy] = this.offsetAtCoordinates(child.props.pos);
 			let [w, h] = this.halfSize();
 			let x = w + dx - left;
@@ -203,7 +205,7 @@ export default class Component extends React.Component {
 		return (
 			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
 				<div>{tiles}</div>
-				<div>{markers}</div>
+				<div>{objects}</div>
 			</DraggableDiv>
 		);
 	}
@@ -231,4 +233,8 @@ export function Marker(props) {
 	return (
 		<div style={style}/>
 	);
+}
+
+export function Pin(props) {
+	return <div>{props.children}</div>;
 }
