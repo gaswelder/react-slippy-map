@@ -7,6 +7,7 @@ const TileSize = 256;
 import {getX, getY, getLat, getLon} from './mercator';
 import DraggableDiv from './DraggableDiv';
 import {clusterize} from './clusters.js';
+import {getTiles} from './tiles.js';
 
 function clusterizeMarkers(markers, distance, threshold) {
 
@@ -100,29 +101,6 @@ export default class Component extends React.Component {
 		this.props.onCenterChange(newCenterCoords);
 	}
 
-	/*
-	 * Returns index ranges of tiles required
-	 * to cover our current container area.
-	 */
-	getTilesRange() {
-		let zoom = this.props.zoom;
-		let lat = this.props.center.latitude;
-		let lon = this.props.center.longitude;
-
-		// Determine where our center is on the projection surface.
-		let x = getX(lon, zoom);
-		let y = getY(lat, zoom);
-
-		let [w, h] = this.halfSize();
-
-		let i1 = Math.floor((x-w) / TileSize);
-		let i2 = Math.floor((x+w) / TileSize);
-		let j1 = Math.floor((y-h) / TileSize);
-		let j2 = Math.floor((y+h) / TileSize);
-
-		return [i1, i2, j1, j2];
-	}
-
 	render() {
 		let style = {
 			height: '500px',
@@ -151,31 +129,26 @@ export default class Component extends React.Component {
 		let lat = this.props.center.latitude;
 		let lon = this.props.center.longitude;
 
-		// Determine the range of tiles we have to get
-		// to cover our area.
-		let [i1, i2, j1, j2] = this.getTilesRange();
-
-		let tiles = [];
+		// Get tiles to cover our area.
+		let x = getX(lon, zoom);
+		let y = getY(lat, zoom);
+		let [w, h] = this.halfSize();
+		let leftTop = {x: x-w, y: y-h};
+		let rightBottom = {x: x+w, y: y+h};
 
 		let x0 = 9672448;
 		let y0 = 5393920;
 
-		for(let i = i1; i <= i2; i++) {
-			for(let j = j1; j <= j2; j++) {
-				let url = `https://a.tile.openstreetmap.org/${zoom}/${i}/${j}.png`;
-				let x = i * 256 - x0;
-				let y = j * 256 - y0;
-				let style = {
-					position: 'absolute',
-					transform: `translate(${x}px, ${y}px)`
-				};
-				tiles.push(
-					<img key={url} src={url} style={style} alt=""/>
-				)
-			}
-		}
+		let tiles = getTiles(leftTop, rightBottom, zoom).map(function(tile) {
+			let x = tile.x - x0;
+			let y = tile.y - y0;
+			let style = {
+				position: 'absolute',
+				transform: `translate(${x}px, ${y}px)`
+			};
+			return <img key={tile.url} src={tile.url} style={style} alt=""/>;
+		});
 
-		let [w, h] = this.halfSize();
 		let left = w - (getX(lon, zoom) - x0);
 		let top = h - (getY(lat, zoom) - y0);
 
