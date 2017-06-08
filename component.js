@@ -6,6 +6,27 @@ const TileSize = 256;
 
 import {getX, getY, getLat, getLon} from './mercator';
 import DraggableDiv from './DraggableDiv';
+import {clusterize} from './clusters.js';
+
+function clusterizeMarkers(markers, distance, threshold) {
+
+	// Create array of points to give to the algorithm.
+	// Keep references to the markers on the points.
+	let points = markers.map(function(marker) {
+		let point = Object.assign({}, marker.props.pos);
+		point.marker = marker;
+		return point;
+	});
+
+	let clusters = clusterize(points, distance, threshold);
+
+	return clusters.map(function(cluster) {
+		return {
+			markers: cluster.map(point => point.marker),
+			center: cluster.center
+		};
+	});
+}
 
 
 export default class Component extends React.Component {
@@ -163,7 +184,36 @@ export default class Component extends React.Component {
 			transform: `translate3d(${left}px, ${top}px, 0px)`
 		};
 
-		let markers = React.Children.map(this.props.children, child => {
+		let markers = React.Children.toArray(this.props.children);
+
+
+		// If clustering is turned on, convert the given list of markers
+		// to a new list according to the clustering result.
+		if(this.props.clusterThreshold > 0) {
+
+			const t = this;
+			function distance(p1, p2) {
+				let r1 = t.offsetAtCoordinates(p1);
+				let r2 = t.offsetAtCoordinates(p2);
+				let dx = r1[0] - r2[0];
+				let dy = r1[1] - r2[1];
+				return Math.sqrt(dx*dx + dy*dy);
+			}
+
+			markers = clusterizeMarkers(markers, distance, this.props.clusterThreshold)
+				.map(function(cluster) {
+					// If a marker didn't get into a cluster,
+					// return it as it was.
+					if(cluster.markers.length == 1) {
+						return cluster.markers[0];
+					}
+					// Replace a cluster of markers with a single
+					// generic marker.
+					return <Marker pos={cluster.center} color="red"/>;
+				});
+		}
+
+		markers = markers.map((child, i) => {
 			let [dx, dy] = this.offsetAtCoordinates(child.props.pos);
 			let [w, h] = this.halfSize();
 			let x = w + dx - left;
@@ -171,11 +221,10 @@ export default class Component extends React.Component {
 
 			let style = {
 				position: 'absolute',
-				transform: `translate(${x}px, ${y}px)`,
-				transition: 'transform 0.1s'
+				transform: `translate(${x}px, ${y}px)`
 			};
 			return (
-				<div style={style}>{child}</div>
+				<div key={i} style={style}>{child}</div>
 			);
 		});
 
@@ -208,7 +257,7 @@ Component.defaultProps = {
 
 export function Marker(props) {
 	let style = {
-		background: '#0091ffe6',
+		background: props.color || '#0091ffe6',
 		width: '16px',
 		height: '16px',
 		borderRadius: '50%',

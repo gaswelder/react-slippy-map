@@ -25,9 +25,10 @@ class Test extends React.Component {
 			lat: 53.9049,
 			lon: 27.5609,
 			zoom: 16,
-			markers: gen(100, randomPos)
+			markers: gen(100, randomPos),
+			clusterThreshold: 10
 		};
-		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick'];
+		let b = ['left', 'right', 'in', 'out', 'onCenterChange', 'onClick', 'setClusterThreshold'];
 		for(let k of b) {
 			this[k] = this[k].bind(this);
 		}
@@ -56,6 +57,10 @@ class Test extends React.Component {
 		this.diff('lon', 0.001);
 	}
 
+	setClusterThreshold(e) {
+		this.setState({clusterThreshold: e.target.value});
+	}
+
 	diff(key, delta) {
 		this.setState(function(s) {
 			return {[key]: s[key] + delta};
@@ -80,6 +85,7 @@ class Test extends React.Component {
 			<div>
 				<Component
 					center={center}
+					clusterThreshold={this.state.clusterThreshold}
 					zoom={this.state.zoom}
 					onCenterChange={this.onCenterChange}
 					onClick={this.onClick}>
@@ -92,6 +98,11 @@ class Test extends React.Component {
 					<button onClick={this.right}>Right</button>
 					<button onClick={this.out}>-</button>
 					<button onClick={this.in}>+</button>
+				</div>
+				<div>
+					<label>Clustering</label>
+					<input type="range" min="0" max="50" onChange={this.setClusterThreshold} value={this.state.clusterThreshold}/>
+					<span>{this.state.clusterThreshold}</span>
 				</div>
 			</div>
 		);
