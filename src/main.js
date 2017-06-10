@@ -10,29 +10,21 @@ export {
 	Clusters
 };
 
-export function MarkerPin(props) {
-	let pinProps = {
-		pos: props.pos,
-		offset: props.offset,
-		zoom: props.zoom
+function pinned(Component) {
+	return function(props) {
+		let pinProps = {
+			pos: props.pos,
+			offset: props.offset,
+			zoom: props.zoom,
+			onClick: props.onClick
+		};
+		return (
+			<Pin {...pinProps}>
+				<Component {...props}>{props.children}</Component>
+			</Pin>
+		);
 	};
-	return (
-		<Pin {...pinProps}>
-			<Marker {...props}>{props.children}</Marker>
-		</Pin>
-	);
 }
 
-export function InfoBoxPin(props) {
-	let pinProps = {
-		pos: props.pos,
-		offset: props.offset,
-		zoom: props.zoom,
-		onClick: props.onClick
-	};
-	return (
-		<Pin {...pinProps}>
-			<InfoBox {...props}>{props.children}</InfoBox>
-		</Pin>
-	);
-}
+export let MarkerPin = pinned(Marker);
+export let InfoBoxPin = pinned(InfoBox);
