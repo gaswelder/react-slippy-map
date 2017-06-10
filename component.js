@@ -6,29 +6,11 @@ const TileSize = 256;
 
 import {getX, getY, getLat, getLon} from './mercator';
 import DraggableDiv from './DraggableDiv';
-import {clusterize} from './clusters.js';
 import {getTiles} from './tiles.js';
+import ObjectsLayer from './ObjectsLayer';
+import {Marker, Pin} from './Objects';
 
-function clusterizeMarkers(markers, distance, threshold) {
-
-	// Create array of points to give to the algorithm.
-	// Keep references to the markers on the points.
-	let points = markers.map(function(marker) {
-		let point = Object.assign({}, marker.props.pos);
-		point.marker = marker;
-		return point;
-	});
-
-	let clusters = clusterize(points, distance, threshold);
-
-	return clusters.map(function(cluster) {
-		return {
-			markers: cluster.map(point => point.marker),
-			center: cluster.center
-		};
-	});
-}
-
+export {Marker, Pin};
 
 export default class Component extends React.Component {
 	constructor(props) {
@@ -135,15 +117,17 @@ export default class Component extends React.Component {
 		let leftTop = {x: x-w, y: y-h};
 		let rightBottom = {x: x+w, y: y+h};
 
-		let x0 = 9672448;
-		let y0 = 5393920;
+		let x0 = 0;
+		let y0 = 0;
 
 		let tiles = getTiles(leftTop, rightBottom, zoom).map(function(tile) {
 			let x = tile.x - x0;
 			let y = tile.y - y0;
 			let style = {
 				position: 'absolute',
-				transform: `translate(${x}px, ${y}px)`
+				//transform: `translate(${x}px, ${y}px)`
+				left: `${x}px`,
+				top: `${y}px`
 			};
 			return <img key={tile.url} src={tile.url} style={style} alt=""/>;
 		});
@@ -153,59 +137,18 @@ export default class Component extends React.Component {
 
 		let layerStyle = {
 			position: 'absolute',
-			transform: `translate3d(${left}px, ${top}px, 0px)`
+			left: `${left}px`,
+			top: `${top}px`
+			//transform: `translate3d(${left}px, ${top}px, 0px)`
 		};
-
-		let children = React.Children.toArray(this.props.children);
-		let markers = children.filter(c => c.type == Marker);
-		let pins = children.filter(c => c.type == Pin);
-
-
-		// If clustering is turned on, convert the given list of markers
-		// to a new list according to the clustering result.
-		if(this.props.clusterThreshold > 0) {
-
-			const t = this;
-			function distance(p1, p2) {
-				let r1 = t.offsetAtCoordinates(p1);
-				let r2 = t.offsetAtCoordinates(p2);
-				let dx = r1[0] - r2[0];
-				let dy = r1[1] - r2[1];
-				return Math.sqrt(dx*dx + dy*dy);
-			}
-
-			markers = clusterizeMarkers(markers, distance, this.props.clusterThreshold)
-				.map(function(cluster) {
-					// If a marker didn't get into a cluster,
-					// return it as it was.
-					if(cluster.markers.length == 1) {
-						return cluster.markers[0];
-					}
-					// Replace a cluster of markers with a single
-					// generic marker.
-					return <Marker pos={cluster.center} color="red"/>;
-				});
-		}
-
-		let objects = pins.concat(markers).map((child, i) => {
-			let [dx, dy] = this.offsetAtCoordinates(child.props.pos);
-			let [w, h] = this.halfSize();
-			let x = w + dx - left;
-			let y = h + dy - top;
-
-			let style = {
-				position: 'absolute',
-				transform: `translate(${x}px, ${y}px)`
-			};
-			return (
-				<div key={i} style={style}>{child}</div>
-			);
-		});
 
 		return (
 			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
 				<div>{tiles}</div>
-				<div>{objects}</div>
+				<ObjectsLayer
+					zoom={this.props.zoom}
+					objects={this.props.children}
+					clusterThreshold={this.props.clusterThreshold}/>
 			</DraggableDiv>
 		);
 	}
@@ -219,22 +162,3 @@ Component.defaultProps = {
 	onCenterChange: noop,
 	onClick: noop
 };
-
-export function Marker(props) {
-	let style = {
-		background: props.color || '#0091ffe6',
-		width: '16px',
-		height: '16px',
-		borderRadius: '50%',
-		boxShadow: '0px 2px 2px #023',
-		transform: 'translate(-8px, -8px)'
-	};
-
-	return (
-		<div style={style}/>
-	);
-}
-
-export function Pin(props) {
-	return <div>{props.children}</div>;
-}
