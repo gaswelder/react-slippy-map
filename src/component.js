@@ -119,9 +119,19 @@ export default class Component extends React.Component {
 		// Get tiles to cover our area.
 		let [w, h] = this.halfSize();
 
-		// Put child layers in a relative coordinate system
-		// to make their numbers smaller.
-		let offset = {x: 9800000, y: 5394920};
+		// To make coordinates of our elements small we have to put all layers
+		// in a relative coordinate system. We might just choose the current
+		// center, but then all relative coordinates would have to be
+		// recalculated on each rendering. We can't choose a static offset
+		// either because that would assume specific zoom and location.
+
+		// So instead we choose a pair of nearby round coordinates. This trims
+		// big numbers nicely while being static most of the time (except when
+		// the user happens to be at round coordinates).
+		let offset = {
+			x: Math.round(getX(lon, zoom) / 10000) * 10000,
+			y: Math.round(getY(lat, zoom) / 10000) * 10000
+		};
 
 		let left = w - (getX(lon, zoom)) + offset.x;
 		let top = h - (getY(lat, zoom)) + offset.y;
