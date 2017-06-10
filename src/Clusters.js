@@ -19,21 +19,20 @@ export default class Clusters extends React.Component {
 				// If a marker didn't get into a cluster,
 				// return it as it was.
 				if (cluster.markers.length == 1) {
-					let m = cluster.markers[0];
-					let N = m.type;
-					let props = Object.assign({}, m.props, {zoom, offset});
-					return <N key={i} {...props}>{m.props.children}</N>;
+					return cluster.markers[0];
 				}
-				// Replace a cluster of markers with a single
-				// generic marker.
-				return (
-					<Pin key={i} pos={cluster.center} zoom={zoom} offset={offset}>
-						<Marker color="red"/>
-					</Pin>
-				);
-			});
+				return <Pin pos={cluster.center}><Marker color="red"/></Pin>;
+			})
+			.map((e, i) => withProps(e, {zoom, offset}, i));
+
 		return <div>{markers}</div>;
 	}
+}
+
+function withProps(ch, more, key) {
+	let props = Object.assign({}, ch.props, more);
+	let C = ch.type;
+	return <C key={key} {...props}>{ch.props.children}</C>;
 }
 
 // Returns distance in pixels between two

@@ -6,16 +6,7 @@ export default class ObjectsLayer extends React.Component {
 		let children = React.Children.toArray(this.props.objects);
 
 		let ch = children.map(function(ch, i) {
-			// Render the child as it is, but with
-			// additional "offset" and "zoom" properties.
-			let props = Object.assign({}, ch.props);
-			props.offset = offset;
-			props.zoom = zoom;
-			delete props.children;
-
-			let C = ch.type;
-			let children = ch.props.children;
-			return <C key={i} {...props}>{children}</C>;
+			return withProps(ch, {offset, zoom}, i);
 		});
 
 		return (
@@ -24,4 +15,10 @@ export default class ObjectsLayer extends React.Component {
 			</div>
 		);
 	}
+}
+
+function withProps(ch, more, key) {
+	let props = Object.assign({}, ch.props, more);
+	let C = ch.type;
+	return <C key={key} {...props}>{ch.props.children}</C>;
 }
