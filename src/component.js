@@ -119,11 +119,12 @@ export default class Component extends React.Component {
 		// Get tiles to cover our area.
 		let [w, h] = this.halfSize();
 
-		let x0 = 0;
-		let y0 = 0;
+		// Put child layers in a relative coordinate system
+		// to make their numbers smaller.
+		let offset = {x: 9800000, y: 5394920};
 
-		let left = w - (getX(lon, zoom) - x0);
-		let top = h - (getY(lat, zoom) - y0);
+		let left = w - (getX(lon, zoom)) + offset.x;
+		let top = h - (getY(lat, zoom)) + offset.y;
 
 		let layerStyle = {
 			position: 'absolute',
@@ -134,11 +135,12 @@ export default class Component extends React.Component {
 
 		return (
 			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
-				<TilesLayer zoom={this.props.zoom} area={this.area()}/>
+				<TilesLayer zoom={this.props.zoom} area={this.area()} offset={offset}/>
 				<ObjectsLayer
 					zoom={this.props.zoom}
 					objects={this.props.children}
-					clusterThreshold={this.props.clusterThreshold}/>
+					clusterThreshold={this.props.clusterThreshold}
+					offset={offset}/>
 			</DraggableDiv>
 		);
 	}

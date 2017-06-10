@@ -44,6 +44,8 @@ function clusterizeMarkers(markers, distance, threshold) {
 
 export default class ObjectsLayer extends React.Component {
 	render() {
+		let offset = this.props.offset;
+
 		let children = React.Children.toArray(this.props.objects);
 		let markers = children.filter(c => c.type == Marker);
 		let pins = children.filter(c => c.type == Pin);
@@ -66,8 +68,8 @@ export default class ObjectsLayer extends React.Component {
 
 		let objects = pins.concat(markers)
 			.map((child, i) => {
-				let px = getX(child.props.pos.longitude, this.props.zoom);
-				let py = getY(child.props.pos.latitude, this.props.zoom);
+				let px = getX(child.props.pos.longitude, this.props.zoom) - offset.x;
+				let py = getY(child.props.pos.latitude, this.props.zoom) - offset.y;
 
 				let style = {
 					position: 'absolute',
@@ -81,7 +83,7 @@ export default class ObjectsLayer extends React.Component {
 			});
 
 		return (
-			<div>{objects}</div>
+			<div className="objects-container">{objects}</div>
 		);
 	}
 }
