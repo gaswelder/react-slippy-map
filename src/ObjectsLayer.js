@@ -5,22 +5,21 @@ import {Pin_} from './Pin';
 
 export default class ObjectsLayer extends React.Component {
 	render() {
-		let offset = this.props.offset;
-
+		let {offset, zoom} = this.props;
 		let children = React.Children.toArray(this.props.objects);
-		let markers = children.filter(c => c.type == Marker);
-		let pins = children.filter(c => c.type == Pin);
 
-		let objects = pins.map((child, i) => {
-				return <Pin_ key={i} pos={child.props.pos} zoom={this.props.zoom} offset={this.props.offset}>{child}</Pin_>;
-			});
+		let ch = children.map(function(ch, i) {
+			let children = ch.props.children;
+			let props = Object.assign({}, ch.props);
+			props.offset = offset;
+			props.zoom = zoom;
+			let C = ch.type;
+			return <C key={i} {...props}>{children}</C>;
+		});
 
 		return (
 			<div className="objects-container">
-				<Clusters offset={this.props.offset} zoom={this.props.zoom} threshold={this.props.clusterThreshold}>
-					{markers}
-				</Clusters>
-				{objects}
+				{ch}
 			</div>
 		);
 	}
