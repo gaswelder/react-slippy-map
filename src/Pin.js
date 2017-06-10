@@ -1,6 +1,7 @@
 import React from 'react';
 import Projection from './mercator';
 
+// Generic container for any content that can be put on the map.
 export default class Pin extends React.Component {
 	render() {
 		let {pos, offset, zoom} = this.props;

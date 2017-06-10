@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Component, Marker, Pin, Clusters} from './src/main';
+import {Component, MarkerPin, Pin, Clusters} from './src/main';
 
 function randomPos() {
 	return {
@@ -95,9 +95,8 @@ class Test extends React.Component {
 					zoom={this.state.zoom}
 					onCenterChange={this.onCenterChange}
 					onClick={this.onClick}>
-
 					<Clusters threshold={this.state.clusterThreshold}>
-						{markers.map((pos, i) => <Marker key={i} pos={pos}/>)}
+						{markers.map((pos, i) => <MarkerPin key={i} pos={pos}/>)}
 					</Clusters>
 					{this.state.notes.map((note, i) => <Pin key={'note-'+i} pos={note.pos}>{note.text}</Pin>)}
 				</Component>

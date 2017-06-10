@@ -1,34 +1,38 @@
 import React from 'react';
 import Projection from './mercator';
-import Pin_ from './Pin';
-import {Marker} from './Objects';
+import Pin from './Pin';
+import {Marker} from './elements';
 
+// A clustering container for map objects. Reorganizes its
+// children merging those of them that are close to each other
+// into generic cluster markers. Children that didn't get
+// into any cluster are rendered without changes.
 export default class Clusters extends React.Component {
 	render() {
-		let {offset, zoom} = this.props;
-
+		let {offset, zoom, threshold} = this.props;
 		let children = React.Children.toArray(this.props.children);
-		let markers = clusterizeMarkers(children, pixelDistance.bind(undefined, this.props.zoom), this.props.threshold)
+		let dist = pixelDistance.bind(undefined, zoom);
+
+		let markers = clusterizeMarkers(children, dist, threshold)
 			.map(function(cluster, i) {
+				let props = {zoom, offset};
 				// If a marker didn't get into a cluster,
 				// return it as it was.
-				if(cluster.markers.length == 1) {
+				if (cluster.markers.length == 1) {
 					let m = cluster.markers[0];
-					return <Pin_ key={i} pos={m.props.pos} zoom={zoom} offset={offset}>{m}</Pin_>;
+					let N = m.type;
+					let props = Object.assign({}, m.props, {zoom, offset});
+					return <N key={i} {...props}>{m.props.children}</N>;
 				}
 				// Replace a cluster of markers with a single
 				// generic marker.
 				return (
-					<Pin_ key={i} pos={cluster.center} zoom={zoom} offset={offset}>
+					<Pin key={i} pos={cluster.center} zoom={zoom} offset={offset}>
 						<Marker color="red"/>
-					</Pin_>
+					</Pin>
 				);
 			});
-		return (
-			<div>
-				{markers}
-			</div>
-		);
+		return <div>{markers}</div>;
 	}
 }
 

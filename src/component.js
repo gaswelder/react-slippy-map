@@ -4,9 +4,7 @@ import Projection from './mercator';
 import DraggableDiv from './DraggableDiv';
 import ObjectsLayer from './ObjectsLayer';
 import TilesLayer from './TilesLayer';
-import {Marker, Pin} from './Objects';
 
-export {Marker, Pin};
 
 export default class Component extends React.Component {
 	constructor(props) {

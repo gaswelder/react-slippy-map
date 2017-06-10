@@ -9,10 +9,5 @@ export function Marker(props) {
 		boxShadow: '0px 2px 2px #023',
 		transform: 'translate(-8px, -8px)'
 	};
-
 	return <div style={style}/>;
-}
-
-export function Pin(props) {
-	return <div>{props.children}</div>;
 }

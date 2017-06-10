@@ -1,7 +1,4 @@
 import React from 'react';
-import {Marker, Pin} from './Objects';
-import Clusters from './Clusters';
-import {Pin_} from './Pin';
 
 export default class ObjectsLayer extends React.Component {
 	render() {
@@ -9,11 +6,15 @@ export default class ObjectsLayer extends React.Component {
 		let children = React.Children.toArray(this.props.objects);
 
 		let ch = children.map(function(ch, i) {
-			let children = ch.props.children;
+			// Render the child as it is, but with
+			// additional "offset" and "zoom" properties.
 			let props = Object.assign({}, ch.props);
 			props.offset = offset;
 			props.zoom = zoom;
+			delete props.children;
+
 			let C = ch.type;
+			let children = ch.props.children;
 			return <C key={i} {...props}>{children}</C>;
 		});
 
