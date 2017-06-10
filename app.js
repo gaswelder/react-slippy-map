@@ -99,7 +99,7 @@ class Test extends React.Component {
 					<Clusters threshold={this.state.clusterThreshold}>
 						{markers.map((pos, i) => <MarkerPin key={i} pos={pos}/>)}
 					</Clusters>
-					{this.state.notes.map((note, i) => <InfoBoxPin key={'note-'+i} pos={note.pos}><code>{note.text}</code></InfoBoxPin>)}
+					{this.state.notes.map((note, i) => <InfoBoxPin onClick={e => e.stopPropagation()} key={'note-'+i} pos={note.pos}><code>{note.text}</code></InfoBoxPin>)}
 				</Component>
 				<div>
 					<label>Zoom</label>

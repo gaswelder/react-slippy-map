@@ -27,7 +27,8 @@ export function InfoBoxPin(props) {
 	let pinProps = {
 		pos: props.pos,
 		offset: props.offset,
-		zoom: props.zoom
+		zoom: props.zoom,
+		onClick: props.onClick
 	};
 	return (
 		<Pin {...pinProps}>

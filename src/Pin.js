@@ -16,6 +16,6 @@ export default class Pin extends React.Component {
 			top: py + 'px'
 			//transform: `translate(${x}px, ${y}px)`
 		};
-		return <div style={style}>{this.props.children}</div>;
+		return <div onClick={this.props.onClick} style={style}>{this.props.children}</div>;
 	}
 }
