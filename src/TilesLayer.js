@@ -20,6 +20,15 @@ export default class TilesLayer extends React.Component {
 		let j1 = Math.floor(y1 / TileSize);
 		let j2 = Math.floor(y2 / TileSize);
 
+		let props = {i1, i2, j1, j2, zoom};
+
+		return <Tiles {...props}/>;
+	}
+}
+
+class Tiles extends React.PureComponent {
+	render() {
+		let {i1, i2, j1, j2, zoom} = this.props;
 		let tiles = [];
 
 		for (let i = i1; i <= i2; i++) {
