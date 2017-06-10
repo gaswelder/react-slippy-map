@@ -1,13 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-// Length a map tile's side in pixels
-const TileSize = 256;
-
 import {getX, getY, getLat, getLon} from './mercator';
 import DraggableDiv from './DraggableDiv';
-import {getTiles} from './tiles.js';
 import ObjectsLayer from './ObjectsLayer';
+import TilesLayer from './TilesLayer';
 import {Marker, Pin} from './Objects';
 
 export {Marker, Pin};
@@ -105,32 +101,26 @@ export default class Component extends React.Component {
 		);
 	}
 
+	// Returns object describing currently visible area
+	// in coordinates.
+	area() {
+		let [w, h] = this.halfSize();
+		return {
+			leftTop: this.coordinatesAtOffset(-w, -h),
+			rightBottom: this.coordinatesAtOffset(w, h)
+		};
+	}
+
 	renderLayer() {
 		let zoom = this.props.zoom;
 		let lat = this.props.center.latitude;
 		let lon = this.props.center.longitude;
 
 		// Get tiles to cover our area.
-		let x = getX(lon, zoom);
-		let y = getY(lat, zoom);
 		let [w, h] = this.halfSize();
-		let leftTop = {x: x-w, y: y-h};
-		let rightBottom = {x: x+w, y: y+h};
 
 		let x0 = 0;
 		let y0 = 0;
-
-		let tiles = getTiles(leftTop, rightBottom, zoom).map(function(tile) {
-			let x = tile.x - x0;
-			let y = tile.y - y0;
-			let style = {
-				position: 'absolute',
-				//transform: `translate(${x}px, ${y}px)`
-				left: `${x}px`,
-				top: `${y}px`
-			};
-			return <img key={tile.url} src={tile.url} style={style} alt=""/>;
-		});
 
 		let left = w - (getX(lon, zoom) - x0);
 		let top = h - (getY(lat, zoom) - y0);
@@ -144,7 +134,7 @@ export default class Component extends React.Component {
 
 		return (
 			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
-				<div>{tiles}</div>
+				<TilesLayer zoom={this.props.zoom} area={this.area()}/>
 				<ObjectsLayer
 					zoom={this.props.zoom}
 					objects={this.props.children}
@@ -153,6 +143,7 @@ export default class Component extends React.Component {
 		);
 	}
 }
+
 
 function noop() {}
 
