@@ -1,6 +1,5 @@
 import React from 'react';
 import {Marker, Pin} from './Objects';
-import {getX, getY, getLat, getLon} from './mercator';
 import Clusters from './Clusters';
 import {Pin_} from './Pin';
 

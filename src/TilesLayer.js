@@ -1,5 +1,5 @@
 import React from 'react';
-import {getX, getY, getLat, getLon} from './mercator';
+import Projection from './mercator';
 
 
 // Length of a map tile's side in pixels
@@ -12,10 +12,10 @@ export default class TilesLayer extends React.Component {
 		let offset = this.props.offset;
 
 		// Convert area to projection coordinates.
-		let x1 = getX(area.leftTop.longitude, zoom);
-		let x2 = getX(area.rightBottom.longitude, zoom);
-		let y1 = getY(area.leftTop.latitude, zoom);
-		let y2 = getY(area.rightBottom.latitude, zoom);
+		let x1 = Projection.getX(area.leftTop.longitude, zoom);
+		let x2 = Projection.getX(area.rightBottom.longitude, zoom);
+		let y1 = Projection.getY(area.leftTop.latitude, zoom);
+		let y2 = Projection.getY(area.rightBottom.latitude, zoom);
 
 		// Find out tile numbers to cover the projection.
 		let i1 = Math.floor(x1 / TileSize);

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {getX, getY, getLat, getLon} from './mercator';
+import Projection from './mercator';
 import DraggableDiv from './DraggableDiv';
 import ObjectsLayer from './ObjectsLayer';
 import TilesLayer from './TilesLayer';
@@ -41,13 +41,13 @@ export default class Component extends React.Component {
 		let lat1 = this.props.center.latitude;
 		let lon1 = this.props.center.longitude;
 		let zoom = this.props.zoom;
-		let mx = getX(lon1, zoom);
-		let my = getY(lat1, zoom);
+		let mx = Projection.getX(lon1, zoom);
+		let my = Projection.getY(lat1, zoom);
 		// Apply the offset to the projection coordinates and get the
 		// corresponding latitude and longitude.
 		return {
-			latitude: getLat(my + y, zoom),
-			longitude: getLon(mx + x, zoom)
+			latitude: Projection.getLat(my + y, zoom),
+			longitude: Projection.getLon(mx + x, zoom)
 		};
 	}
 
@@ -57,12 +57,12 @@ export default class Component extends React.Component {
 		let zoom = this.props.zoom;
 
 		// Get location of our center on the projection
-		let px = getX(this.props.center.longitude, zoom);
-		let py = getY(this.props.center.latitude, zoom);
+		let px = Projection.getX(this.props.center.longitude, zoom);
+		let py = Projection.getY(this.props.center.latitude, zoom);
 
 		// Get location of the given point on the projection
-		let cx = getX(longitude, zoom);
-		let cy = getY(latitude, zoom);
+		let cx = Projection.getX(longitude, zoom);
+		let cy = Projection.getY(latitude, zoom);
 
 		// Get the difference
 		let dx = cx - px;
@@ -129,12 +129,12 @@ export default class Component extends React.Component {
 		// big numbers nicely while being static most of the time (except when
 		// the user happens to be at round coordinates).
 		let offset = {
-			x: Math.round(getX(lon, zoom) / 10000) * 10000,
-			y: Math.round(getY(lat, zoom) / 10000) * 10000
+			x: Math.round(Projection.getX(lon, zoom) / 10000) * 10000,
+			y: Math.round(Projection.getY(lat, zoom) / 10000) * 10000
 		};
 
-		let left = w - (getX(lon, zoom)) + offset.x;
-		let top = h - (getY(lat, zoom)) + offset.y;
+		let left = w - (Projection.getX(lon, zoom)) + offset.x;
+		let top = h - (Projection.getY(lat, zoom)) + offset.y;
 
 		let layerStyle = {
 			position: 'absolute',

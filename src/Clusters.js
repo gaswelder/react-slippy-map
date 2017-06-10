@@ -1,5 +1,5 @@
 import React from 'react';
-import {getX, getY, getLat, getLon} from './mercator';
+import Projection from './mercator';
 import Pin_ from './Pin';
 import {Marker} from './Objects';
 
@@ -46,8 +46,8 @@ function pixelDistance(zoom, p1, p2) {
 // for the given point at given zoom level.
 function projectionCoords(point, zoom) {
 	return [
-		getX(point.longitude, zoom),
-		getY(point.latitude, zoom)
+		Projection.getX(point.longitude, zoom),
+		Projection.getY(point.latitude, zoom)
 	];
 }
 

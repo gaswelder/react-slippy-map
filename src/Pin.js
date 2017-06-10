@@ -1,14 +1,13 @@
 import React from 'react';
-import {getX, getY, getLat, getLon} from './mercator';
-
+import Projection from './mercator';
 
 export default class Pin extends React.Component {
 	render() {
 		let {pos, offset, zoom} = this.props;
 
 		// Get projection coordinates and subtract our coordinates offset.
-		let px = getX(pos.longitude, zoom) - offset.x;
-		let py = getY(pos.latitude, zoom) - offset.y;
+		let px = Projection.getX(pos.longitude, zoom) - offset.x;
+		let py = Projection.getY(pos.latitude, zoom) - offset.y;
 
 		let style = {
 			position: 'absolute',

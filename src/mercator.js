@@ -17,7 +17,7 @@ function radius(zoom) {
  * longitudes change from -180 to 180;
  * x changes from 0 to R * 2pi.
  */
-export function getX(lon, zoom) // -180..180
+function getX(lon, zoom) // -180..180
 {
 	let R = radius(zoom);
 
@@ -29,7 +29,7 @@ export function getX(lon, zoom) // -180..180
  * Returns y-coordinate on the Mercator cylinder
  * corresponding to the given latitude.
  */
-export function getY(lat, zoom) {
+function getY(lat, zoom) {
 	let R = radius(zoom);
 
 	let phi = toRad(lat); // -pi/2..pi/2
@@ -45,7 +45,7 @@ export function getY(lat, zoom) {
  * Returns the latitude corresponding to the given
  * y-coordinate on the Mercator cylinder.
  */
-export function getLat(y, zoom) {
+function getLat(y, zoom) {
 	let R = radius(zoom);
 
 	// Invert because we measure from top.
@@ -61,7 +61,7 @@ export function getLat(y, zoom) {
  * Returns the longitude corresponding to the given
  * x-coordinate on the Mercator cylinder.
  */
-export function getLon(x, zoom) {
+function getLon(x, zoom) {
 	let R = radius(zoom);
 
 	let lambda = x / R; // 0..2pi
@@ -76,3 +76,5 @@ function toDeg(rad) {
 function toRad(deg) {
 	return deg * Math.PI / 180;
 }
+
+export default {getX, getY, getLon, getLat};
