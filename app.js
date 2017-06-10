@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Component from './src/component';
-import {Marker, Pin} from './src/component';
+import {Component, Marker, Pin} from './src/main';
 
 function randomPos() {
 	return {
