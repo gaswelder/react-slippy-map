@@ -22,7 +22,15 @@ export default class TilesLayer extends React.Component {
 
 		let props = {i1, i2, j1, j2, zoom};
 
-		return <Tiles {...props}/>;
+		let style = {
+			width: (i2-i1+1) * TileSize + 'px',
+			height: (j2-j1+1) * TileSize + 'px',
+			position: 'absolute',
+			left: (i1 * TileSize) + 'px',
+			top: (j1 * TileSize) + 'px'
+		};
+
+		return <div style={style}><Tiles {...props}/></div>;
 	}
 }
 
@@ -37,13 +45,12 @@ class Tiles extends React.PureComponent {
 				let url = `https://a.tile.openstreetmap.org/${key}.png`;
 				let style = {
 					position: 'absolute',
-					//transform: `translate(${x}px, ${y}px)`
-					left: (i * TileSize) + 'px',
-					top: (j * TileSize) + 'px'
+					left: ((i-i1) * TileSize) + 'px',
+					top: ((j-j1) * TileSize) + 'px'
 				};
-				tiles.push(<img style={style} src={url} key={key} alt=""/>);
+				tiles.push(<img src={url} style={style} key={key} alt=""/>);
 			}
 		}
-		return <div className="tiles">{tiles}</div>;
+		return <div style={{position: 'relative'}} className="tiles">{tiles}</div>;
 	}
 }
