@@ -102,7 +102,7 @@ class Test extends React.Component {
 				</Component>
 				<div>
 					<label>Zoom</label>
-					<Range max={22} onChange={this.setZoom} value={this.state.zoom}/>
+					<Range max={19} onChange={this.setZoom} value={this.state.zoom}/>
 				</div>
 				<div>
 					<label>Number of markers</label>
