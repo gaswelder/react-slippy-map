@@ -4,7 +4,7 @@ const boxShadow = '0px 2px 2px #023';
 
 export function Marker(props) {
 	let style = {
-		background: props.color || '#0091ffe6',
+		background: props.color || '#0091ff',
 		width: '16px',
 		height: '16px',
 		borderRadius: '50%',
