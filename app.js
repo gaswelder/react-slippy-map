@@ -81,6 +81,21 @@ class Test extends React.Component {
 		});
 	}
 
+	onMarkerClick(e) {
+		e.stopPropagation();
+	}
+
+	onInfoBoxClick(i, e) {
+		e.stopPropagation();
+	}
+
+	onInfoBoxRightClick(i, e) {
+		e.preventDefault();
+		let notes = this.state.notes;
+		notes.splice(i, 1);
+		this.setState({notes});
+	}
+
 	render() {
 		let center = {
 			latitude: this.state.lat,
@@ -97,9 +112,15 @@ class Test extends React.Component {
 					onCenterChange={this.onCenterChange}
 					onClick={this.onClick}>
 					<Clusters threshold={this.state.clusterThreshold}>
-						{markers.map((pos, i) => <MarkerPin key={i} pos={pos}/>)}
+						{markers.map((pos, i) => <MarkerPin onClick={this.onMarkerClick} key={i} pos={pos}/>)}
 					</Clusters>
-					{this.state.notes.map((note, i) => <InfoBoxPin onClick={e => e.stopPropagation()} key={'note-'+i} pos={note.pos}><code>{note.text}</code></InfoBoxPin>)}
+					{this.state.notes.map((note, i) => <InfoBoxPin
+						key={'note-'+i}
+						pos={note.pos}
+						onClick={this.onInfoBoxClick}
+						onContextMenu={this.onInfoBoxRightClick.bind(this, i)}>
+							<code>{note.text}</code>
+						</InfoBoxPin>)}
 				</Component>
 				<div>
 					<label>Zoom</label>

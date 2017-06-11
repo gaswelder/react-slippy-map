@@ -12,12 +12,7 @@ export {
 
 function pinned(Component) {
 	return function(props) {
-		let pinProps = {
-			pos: props.pos,
-			offset: props.offset,
-			zoom: props.zoom,
-			onClick: props.onClick
-		};
+		let pinProps = props;
 		return (
 			<Pin {...pinProps}>
 				<Component {...props}>{props.children}</Component>
