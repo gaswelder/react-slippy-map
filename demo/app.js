@@ -117,7 +117,8 @@ class Test extends React.Component {
 		return (
 			<div>
 				<SlippyMapWithControls center={center} zoom={this.state.zoom}
-					onCenterChange={this.onCenterChange}>
+					onCenterChange={this.onCenterChange}
+					baseTilesUrl="https://b.tile.openstreetmap.org">
 					<Clusters objects={orders} render={renderOrdersCluster}/>
 					<Clusters objects={drivers} render={renderDriverCluster}/>
 				</SlippyMapWithControls>

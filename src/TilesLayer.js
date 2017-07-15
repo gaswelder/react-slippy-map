@@ -32,7 +32,8 @@ export default class TilesLayer extends React.Component {
 			top: layerY + 'px'
 		};
 
-		let props = {i1, i2, j1, j2, zoom};
+		let baseUrl = this.props.baseUrl;
+		let props = {i1, i2, j1, j2, zoom, baseUrl};
 		return <div className="tiles-container" style={style}><Tiles {...props}/></div>;
 	}
 }
@@ -41,11 +42,12 @@ class Tiles extends React.PureComponent {
 	render() {
 		let {i1, i2, j1, j2, zoom} = this.props;
 		let tiles = [];
+		let baseUrl = this.props.baseUrl;
 
 		for (let i = i1; i <= i2; i++) {
 			for (let j = j1; j <= j2; j++) {
 				let key = `${zoom}/${i}/${j}`;
-				let url = `https://a.tile.openstreetmap.org/${key}.png`;
+				let url = `${baseUrl}/${key}.png`;
 				let style = {
 					position: 'absolute',
 					left: ((i-i1) * TileSize) + 'px',
@@ -60,3 +62,6 @@ class Tiles extends React.PureComponent {
 		return <div style={{position: 'relative'}} className="tiles">{tiles}</div>;
 	}
 }
+Tiles.defaultProps = {
+	baseUrl: 'https://a.tile.openstreetmap.org'
+};
