@@ -1,13 +1,15 @@
 import React from 'react';
-import SlippyMap from './SlippyMap';
 import Clusters from './Clusters';
 import Pin from './Pin';
+import SlippyMap from './SlippyMap';
+import SlippyMapWithControls from './SlippyMapWithControls';
 import {Marker, InfoBox} from './elements';
 
 export {
+	Clusters,
 	Pin,
 	SlippyMap,
-	Clusters
+	SlippyMapWithControls
 };
 
 export function pinned(Component) {
