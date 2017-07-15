@@ -10,7 +10,7 @@ export {
 	Clusters
 };
 
-function pinned(Component) {
+export function pinned(Component) {
 	return function(props) {
 		let pinProps = props;
 		return (
