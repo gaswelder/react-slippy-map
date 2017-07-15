@@ -1,12 +1,14 @@
 module.exports = {
-	entry: './app.js',
+	entry: './src/index.js',
 	output: {
 		path: __dirname,
-		filename: 'app.bin.js'
+		filename: 'index.js',
+		libraryTarget: 'umd'
 	},
 	module: {
 		rules: [
 			{test: /\.js$/, exclude: /node_modules/, use: ['babel-loader']}
 		]
-	}
+	},
+	externals: ['react', 'react-dom']
 };
