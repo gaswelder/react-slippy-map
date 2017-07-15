@@ -159,7 +159,7 @@ export default class SlippyMap extends React.Component {
 		};
 
 		return (
-			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag}>
+			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag} onWheel={this.props.onWheel}>
 				<TilesLayer zoom={this.props.zoom} area={this.area()} offset={offset}/>
 				<ObjectsLayer
 					zoom={this.props.zoom}
