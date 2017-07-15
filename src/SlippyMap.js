@@ -6,7 +6,7 @@ import ObjectsLayer from './ObjectsLayer';
 import TilesLayer from './TilesLayer';
 
 
-export default class Component extends React.Component {
+export default class SlippyMap extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -174,7 +174,7 @@ export default class Component extends React.Component {
 
 function noop() {}
 
-Component.defaultProps = {
+SlippyMap.defaultProps = {
 	zoom: 16,
 	center: {latitude: 53.9049, longitude: 27.5609},
 	onCenterChange: noop,

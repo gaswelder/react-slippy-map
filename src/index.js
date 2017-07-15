@@ -1,12 +1,12 @@
 import React from 'react';
-import Component from './component';
+import SlippyMap from './SlippyMap';
 import Clusters from './Clusters';
 import Pin from './Pin';
 import {Marker, InfoBox} from './elements';
 
 export {
 	Pin,
-	Component,
+	SlippyMap,
 	Clusters
 };
 
