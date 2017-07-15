@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {SlippyMapWithControls, pinned, Clusters} from './src';
+import {SlippyMapWithControls, pinned, Clusters} from '..';
 
 const drivers = [
 	{id: '2606', coords: {latitude: 53.938787, longitude: 27.584183}},
