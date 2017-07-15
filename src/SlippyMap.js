@@ -103,8 +103,8 @@ export default class SlippyMap extends React.Component {
 
 	render() {
 		let style = {
-			height: '500px',
-			border: 'thin solid red',
+			minHeight: '1em',
+			height: '100%',
 			position: 'relative',
 			overflow: 'hidden'
 		};

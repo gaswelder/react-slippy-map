@@ -22,6 +22,9 @@ function MyComponent() {
 }
 ```
 
+The map component has width and height assigned to 100%, thus its size is
+controlled by the size of its container.
+
 
 ## Map tiles
 

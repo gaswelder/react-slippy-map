@@ -2,7 +2,8 @@ import React from 'react'
 import SlippyMap from './SlippyMap';
 
 const containerStyle = {
-	position: 'relative'
+	position: 'relative',
+	height: '100%'
 };
 
 export default class SlippyMapWithControls extends React.Component {
