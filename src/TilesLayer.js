@@ -49,9 +49,12 @@ class Tiles extends React.PureComponent {
 				let style = {
 					position: 'absolute',
 					left: ((i-i1) * TileSize) + 'px',
-					top: ((j-j1) * TileSize) + 'px'
+					top: ((j-j1) * TileSize) + 'px',
+					width: TileSize + 'px',
+					height: TileSize + 'px',
+					backgroundColor: '#e6ec88'
 				};
-				tiles.push(<img src={url} style={style} key={key} alt=""/>);
+				tiles.push(<div key={key} style={style}><img src={url} alt=""/></div>);
 			}
 		}
 		return <div style={{position: 'relative'}} className="tiles">{tiles}</div>;
