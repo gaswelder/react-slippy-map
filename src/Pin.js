@@ -5,6 +5,9 @@ import Projection from './mercator';
 export default class Pin extends React.Component {
 	render() {
 		let {coords, offset, zoom} = this.props;
+		if (!offset || !zoom) {
+			console.error("Internal error: the pin didn't receive offset or zoom properties");
+		}
 		let divProps = propsExcept(this.props, ['coords', 'offset', 'zoom']);
 
 		// Get projection coordinates and subtract our coordinates offset.
