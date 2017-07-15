@@ -11,6 +11,7 @@ export default class Component extends React.Component {
 		super(props);
 
 		this.state = {
+			// Current size of the map's container element.
 			containerSize: [0, 0]
 		};
 
@@ -18,16 +19,20 @@ export default class Component extends React.Component {
 		this.onDrag = this.onDrag.bind(this);
 	}
 
+	// When the map is mounted, we can get its container via ref
+	// (see render) and measure its size here.
 	componentDidMount() {
 		let c = this._container;
+
+		// This will trigger a rerender, but this is exactly what
+		// we need since the first render returned nothing because
+		// the container was still missing.
 		this.setState({
 			containerSize: [c.offsetWidth, c.offsetHeight]
 		});
 	}
 
-	/*
-	 * Returns halved width and height of the container.
-	 */
+	// Returns halved width and height of the container in pixels.
 	halfSize() {
 		return [this.state.containerSize[0]/2, this.state.containerSize[1]/2];
 	}
@@ -68,8 +73,15 @@ export default class Component extends React.Component {
 		return [dx, dy];
 	}
 
+	// Processes click events and passes the to the listener in
+	// the props.
 	onClick(event) {
-		// Find out click offset from the center.
+		// If there is no listeners, then why bother.
+		if (!this.props.onClick) {
+			return;
+		}
+
+		// Find out the click event's offset from the center.
 		let x = event.pageX - this._container.offsetLeft;
 		let y = event.pageY - this._container.offsetTop;
 		let [w, h] = this.halfSize();
@@ -79,7 +91,12 @@ export default class Component extends React.Component {
 		this.props.onClick(clickCoords);
 	}
 
+	// Preprocesses dragging events and calls the listener in the props.
 	onDrag(event) {
+		// If there is no listener, don't bother.
+		if (!this.props.onCenterChange) {
+			return;
+		}
 		let newCenterCoords = this.coordinatesAtOffset(-event.dx, -event.dy);
 		this.props.onCenterChange(newCenterCoords);
 	}
