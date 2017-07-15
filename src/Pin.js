@@ -4,12 +4,12 @@ import Projection from './mercator';
 // Generic container for any content that can be put on the map.
 export default class Pin extends React.Component {
 	render() {
-		let {pos, offset, zoom} = this.props;
-		let divProps = propsExcept(this.props, ['pos', 'offset', 'zoom']);
+		let {coords, offset, zoom} = this.props;
+		let divProps = propsExcept(this.props, ['coords', 'offset', 'zoom']);
 
 		// Get projection coordinates and subtract our coordinates offset.
-		let px = Projection.getX(pos.longitude, zoom) - offset.x;
-		let py = Projection.getY(pos.latitude, zoom) - offset.y;
+		let px = Projection.getX(coords.longitude, zoom) - offset.x;
+		let py = Projection.getY(coords.latitude, zoom) - offset.y;
 
 		let style = {
 			position: 'absolute',

@@ -21,7 +21,7 @@ export default class Clusters extends React.Component {
 				if (cluster.markers.length == 1) {
 					return cluster.markers[0];
 				}
-				return <Pin pos={cluster.center}><Marker color="red"/></Pin>;
+				return <Pin coords={cluster.center}><Marker color="red"/></Pin>;
 			})
 			.map((e, i) => withProps(e, {zoom, offset}, i));
 
@@ -59,7 +59,7 @@ function clusterizeMarkers(markers, distance, threshold) {
 	// Create array of points to give to the algorithm.
 	// Keep references to the markers on the points.
 	let points = markers.map(function(marker) {
-		let point = Object.assign({}, marker.props.pos);
+		let point = Object.assign({}, marker.props.coords);
 		point.marker = marker;
 		return point;
 	});
