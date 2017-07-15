@@ -1,33 +1,94 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Component, MarkerPin, InfoBoxPin, Clusters} from './src/main';
+import {SlippyMapWithControls, pinned, Clusters} from './src';
 
-function randomPos() {
-	return {
-		latitude: 53.9049 + (Math.random()-0.5) * 0.01,
-		longitude: 27.5609 + (Math.random()-0.5) * 0.01
-	};
-}
+const drivers = [
+	{id: '2606', coords: {latitude: 53.938787, longitude: 27.584183}},
+	{id: '2601', coords: {latitude: 53.903757, longitude: 27.547987}},
+	{id: '2602', coords: {latitude: 53.856910, longitude: 27.516632}},
+	{id: '2605', coords: {latitude: 53.904469, longitude: 27.504182}},
+	{id: '2603', coords: {latitude: 53.869937, longitude: 27.497484}},
+	{id: '2604', coords: {latitude: 53.927968, longitude: 27.525654}},
+];
 
-function gen(size, func) {
-	let r = [];
-	for(let i = 0; i < size; i++) {
-		r.push(func());
-	}
-	return r;
-}
+const orders = [
+  {coords: {"latitude": 53.90296355003832, "longitude": 27.559806978802214}},
+  {coords: {"latitude": 53.903689931819486, "longitude": 27.56444176390902}},
+  {coords: {"latitude": 53.90804802568297, "longitude": 27.561096715085373}},
+  {coords: {"latitude": 53.90761027928621, "longitude": 27.556838702632835}},
+  {coords: {"latitude": 53.90709315593021, "longitude": 27.561499687161323}},
+  {coords: {"latitude": 53.90100615400766, "longitude": 27.55706148657135}},
+  {coords: {"latitude": 53.908955988671416, "longitude": 27.55669124185427}},
+  {coords: {"latitude": 53.906273261768796, "longitude": 27.56545966433497}},
+  {coords: {"latitude": 53.908507555124025, "longitude": 27.56393545697117}},
+  {coords: {"latitude": 53.903867035315564, "longitude": 27.56452545061912}},
+  {coords: {"latitude": 53.90598579766926, "longitude": 27.557039927959572}},
+  {coords: {"latitude": 53.90060229253878, "longitude": 27.556207692316573}},
+  {coords: {"latitude": 53.90840976601857, "longitude": 27.560728986424333}},
+  {coords: {"latitude": 53.905734598488095, "longitude": 27.556806262637124}},
+  {coords: {"latitude": 53.90893783637087, "longitude": 27.55742158643696}},
+  {coords: {"latitude": 53.90824133919154, "longitude": 27.563984938382173}},
+  {coords: {"latitude": 53.90823388423552, "longitude": 27.557592381335}},
+  {coords: {"latitude": 53.90923303785389, "longitude": 27.55928765451716}},
+  {coords: {"latitude": 53.90279618479734, "longitude": 27.56475873073345}},
+  {coords: {"latitude": 53.905981777806005, "longitude": 27.562723790027288}},
+  {coords: {"latitude": 53.90874530194332, "longitude": 27.56430789243165}},
+  {coords: {"latitude": 53.902753914290386, "longitude": 27.56497244853907}}
+].map(function(o) {
+	o.latitude += (Math.random()-0.5) * 0.1;
+	o.longitude += (Math.random()-0.5) * 0.1;
+	return o;
+});
 
-const pointsSource = {
-	all: [],
 
-	get(n) {
-		let m = n - this.all.length;
-		if(m > 0) {
-			this.all = this.all.concat(gen(m, randomPos));
-		}
-		return this.all.slice(0, n);
-	}
+const driverStyle = {
+	background: 'rgba(255, 255, 255, 0.8)',
+	padding: '1em',
+	boxShadow: '1px 1px 2px #666'
 };
+
+const DriverMarker = pinned(function(props) {
+	return (
+		<div style={driverStyle}>{props.id}</div>
+	);
+})
+
+const orderStyle = {
+	background: 'green',
+	width: '24px',
+	height: '24px',
+	borderRadius: '12px',
+	color: 'white',
+	fontWeight: 'bold',
+	textAlign: 'center',
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center'
+};
+
+const OrderMarker = pinned(function(props) {
+	return (
+		<div style={orderStyle}>{props.id}</div>
+	);
+})
+
+function renderDriverCluster(cluster) {
+	let ids = [];
+	for (let d of cluster.objects) {
+		ids.push(d.id);
+	}
+	return (
+		<div style={driverStyle}>{ids.join(', ')}</div>
+	);
+}
+
+function renderOrdersCluster(cluster) {
+	if (cluster.objects.length == 1) {
+		return <div style={orderStyle}></div>;
+	}
+	return <div style={orderStyle}>{cluster.objects.length}</div>;
+}
+
 
 class Test extends React.Component {
 	constructor(props) {
@@ -35,65 +96,16 @@ class Test extends React.Component {
 		this.state = {
 			lat: 53.9049,
 			lon: 27.5609,
-			zoom: 16,
-			markersNumber: 10,
-			notes: [],
-			clusterThreshold: 10
+			zoom: 13
 		};
-		let b = ['onCenterChange', 'onClick', 'setClusterThreshold', 'setMarkersNumber', 'setZoom'];
-		for(let k of b) {
-			this[k] = this[k].bind(this);
-		}
+		this.onCenterChange = this.onCenterChange.bind(this);
 	}
-
-	// componentDidMount() {
-	// 	let s = new Swarm();
-	// 	s.subscribe(markers => {
-	// 		this.setState({markers});
-	// 	})
-	// }
 
 	onCenterChange(coords) {
 		this.setState({
 			lat: coords.latitude,
 			lon: coords.longitude
 		});
-		//console.log(coords);
-	}
-
-	setClusterThreshold(e) {
-		this.setState({clusterThreshold: e.target.value});
-	}
-
-	setMarkersNumber(e) {
-		this.setState({markersNumber: e.target.value});
-	}
-
-	setZoom(e) {
-		this.setState({zoom: e.target.value});
-	}
-
-	onClick(pos) {
-		let text = pos.latitude.toFixed(7) + ', ' + pos.longitude.toFixed(7);
-		let note = {pos, text};
-		this.setState(function(s) {
-			return {notes: s.notes.concat(note)};
-		});
-	}
-
-	onMarkerClick(e) {
-		e.stopPropagation();
-	}
-
-	onInfoBoxClick(i, e) {
-		e.stopPropagation();
-	}
-
-	onInfoBoxRightClick(i, e) {
-		e.preventDefault();
-		let notes = this.state.notes;
-		notes.splice(i, 1);
-		this.setState({notes});
 	}
 
 	render() {
@@ -102,50 +114,16 @@ class Test extends React.Component {
 			longitude: this.state.lon
 		};
 
-		let markers = pointsSource.get(this.state.markersNumber);
 		return (
 			<div>
-				<Component
-					center={center}
-					clusterThreshold={this.state.clusterThreshold}
-					zoom={this.state.zoom}
-					onCenterChange={this.onCenterChange}
-					onClick={this.onClick}>
-					<Clusters threshold={this.state.clusterThreshold}>
-						{markers.map((pos, i) => <MarkerPin onClick={this.onMarkerClick} key={i} pos={pos}/>)}
-					</Clusters>
-					{this.state.notes.map((note, i) => <InfoBoxPin
-						key={'note-'+i}
-						pos={note.pos}
-						onClick={this.onInfoBoxClick}
-						onContextMenu={this.onInfoBoxRightClick.bind(this, i)}>
-							<code>{note.text}</code>
-						</InfoBoxPin>)}
-				</Component>
-				<div>
-					<label>Zoom</label>
-					<Range max={19} onChange={this.setZoom} value={this.state.zoom}/>
-				</div>
-				<div>
-					<label>Number of markers</label>
-					<Range max={500} onChange={this.setMarkersNumber} value={this.state.markersNumber}/>
-				</div>
-				<div>
-					<label>Clustering</label>
-					<Range max={50} onChange={this.setClusterThreshold} value={this.state.clusterThreshold}/>
-				</div>
+				<SlippyMapWithControls center={center} zoom={this.state.zoom}
+					onCenterChange={this.onCenterChange}>
+					<Clusters objects={orders} render={renderOrdersCluster}/>
+					<Clusters objects={drivers} render={renderDriverCluster}/>
+				</SlippyMapWithControls>
 			</div>
 		);
 	}
-}
-
-function Range(props) {
-	return (
-		<div>
-			<input type="range" min="0" max={props.max} onChange={props.onChange} value={props.value}/>
-			<span>{props.value}</span>
-		</div>
-	);
 }
 
 let container = document.createElement('div');
