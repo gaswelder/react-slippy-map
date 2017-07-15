@@ -164,7 +164,6 @@ export default class SlippyMap extends React.Component {
 				<ObjectsLayer
 					zoom={this.props.zoom}
 					objects={this.props.children}
-					clusterThreshold={this.props.clusterThreshold}
 					offset={offset}/>
 			</DraggableDiv>
 		);

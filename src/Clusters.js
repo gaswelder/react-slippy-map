@@ -3,31 +3,42 @@ import Projection from './mercator';
 import Pin from './Pin';
 import {Marker} from './elements';
 
+function defaultRender(cluster) {
+	if (cluster.objects.length == 1) {
+		return <Marker/>;
+	}
+	return <Marker color="red"/>;
+}
+
 // A clustering container for map objects. Reorganizes its
 // children merging those of them that are close to each other
 // into generic cluster markers. Children that didn't get
 // into any cluster are rendered without changes.
-export default class Clusters extends React.Component {
+export default class Clusters extends React.PureComponent {
 	render() {
-		let {offset, zoom, threshold} = this.props;
-		let children = React.Children.toArray(this.props.children);
+		let {offset, zoom, threshold, objects} = this.props;
 		let dist = pixelDistance.bind(undefined, zoom);
+		let render = this.props.render;
 
-		let markers = clusterizeMarkers(children, dist, threshold)
-			.map(function(cluster, i) {
-				let props = {zoom, offset};
-				// If a marker didn't get into a cluster,
-				// return it as it was.
-				if (cluster.markers.length == 1) {
-					return cluster.markers[0];
-				}
-				return <Pin coords={cluster.center}><Marker color="red"/></Pin>;
-			})
-			.map((e, i) => withProps(e, {zoom, offset}, i));
+		// Get an array of clusters.
+		let clusters = clusterizeObjects(objects, dist, threshold);
+
+		// Convert clusters to pinnable components
+		let markers = clusters.map(function(cluster, i) {
+			let renderedCluster = render(cluster);
+			return <Pin key={i} {...{offset, zoom}} coords={cluster.coords}>{renderedCluster}</Pin>;
+			//return withProps(renderedCluster, {zoom, offset}, i);
+		});
 
 		return <div>{markers}</div>;
 	}
 }
+
+Clusters.defaultProps = {
+	threshold: 20,
+	objects: [],
+	render: defaultRender
+};
 
 function withProps(ch, more, key) {
 	let props = Object.assign({}, ch.props, more);
@@ -54,13 +65,18 @@ function projectionCoords(point, zoom) {
 	];
 }
 
-function clusterizeMarkers(markers, distance, threshold) {
-
-	// Create array of points to give to the algorithm.
+// Takes an array of objects and returns an array of clusters.
+// Each object must have a `coords` field with {latitude, longitude} values.
+function clusterizeObjects(objects, distance, threshold) {
+	// Create a array of points to give to the algorithm.
 	// Keep references to the markers on the points.
-	let points = markers.map(function(marker) {
-		let point = Object.assign({}, marker.props.coords);
-		point.marker = marker;
+	let points = objects.map(function(object) {
+		// We need to give a plain point to the function
+		// below, but keep a reference to the full objects.
+		// Instead of mutating the coords themselves, give
+		// a copy.
+		let point = Object.assign({}, object.coords);
+		point.object = object;
 		return point;
 	});
 
@@ -68,8 +84,8 @@ function clusterizeMarkers(markers, distance, threshold) {
 
 	return clusters.map(function(cluster) {
 		return {
-			markers: cluster.map(point => point.marker),
-			center: cluster.center
+			objects: cluster.map(point => point.object),
+			coords: cluster.center
 		};
 	});
 }
@@ -81,7 +97,6 @@ function clusterizeMarkers(markers, distance, threshold) {
 // * threshold is the distance threshold for the clustering, in the
 //   same units as the distance.
 function clusterize(points, distance, threshold) {
-
 	// Create a list of clusters, each with a single marker in it.
 	let clusters = points.map(p => [p]);
 
