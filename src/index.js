@@ -13,7 +13,7 @@ export {
 };
 
 export function pinned(Component) {
-	return function(props) {
+	let f = function(props) {
 		let pinProps = props;
 		return (
 			<Pin {...pinProps}>
@@ -21,6 +21,8 @@ export function pinned(Component) {
 			</Pin>
 		);
 	};
+	f._isPinned = true;
+	return f;
 }
 
 export let MarkerPin = pinned(Marker);

@@ -26,6 +26,15 @@ export default class Clusters extends React.PureComponent {
 		// Convert clusters to pinnable components
 		let markers = clusters.map(function(cluster, i) {
 			let renderedCluster = render(cluster);
+
+			// A common mistake is to pass a pinned component as a cluster
+			// rendering. This causes an error, which we avoid by getting
+			// to the existing pin.
+			if (renderedCluster.type._isPinned) {
+				let props = Object.assign({}, renderedCluster.props, {offset, zoom}, {coords: cluster.coords});
+				let PinnedContent = renderedCluster.type;
+				return <PinnedContent key={i} {...props}/>;
+			}
 			return <Pin key={i} {...{offset, zoom}} coords={cluster.coords}>{renderedCluster}</Pin>;
 			//return withProps(renderedCluster, {zoom, offset}, i);
 		});
