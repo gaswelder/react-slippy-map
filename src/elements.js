@@ -24,3 +24,7 @@ export function InfoBox(props) {
 	};
 	return <div style={style}>{props.children}</div>;
 }
+
+export function Label(props) {
+	return <InfoBox>{props.text}</InfoBox>
+}

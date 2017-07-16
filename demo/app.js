@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {SlippyMapWithControls, pinned, Clusters} from '../src';
+import {SlippyMapWithControls, pinned, Clusters, Label, Marker} from '../src';
 
 const drivers = [
 	{id: '2606', coords: {latitude: 53.938787, longitude: 27.584183}},
@@ -40,6 +40,7 @@ const orders = [
 	return o;
 });
 
+const user = {coords: {"latitude": 53.909689, "longitude": 27.57244}};
 
 const driverStyle = {
 	background: 'rgba(255, 255, 255, 0.8)',
@@ -121,6 +122,10 @@ class Test extends React.Component {
 					baseTilesUrl="https://b.tile.openstreetmap.org">
 					<Clusters objects={orders} render={renderOrdersCluster}/>
 					<Clusters objects={drivers} render={renderDriverCluster}/>
+
+					<Label text="You are here" coords={user.coords}/>
+					<Marker coords={user.coords}/>
+
 				</SlippyMapWithControls>
 			</div>
 		);

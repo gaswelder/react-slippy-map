@@ -3,7 +3,7 @@ import Clusters from './Clusters';
 import Pin from './Pin';
 import SlippyMap from './SlippyMap';
 import SlippyMapWithControls from './SlippyMapWithControls';
-import {Marker, InfoBox} from './elements';
+import {Marker as PureMarker, Label as PureLabel, InfoBox as PureInfoBox} from './elements';
 
 export {
 	Clusters,
@@ -25,5 +25,6 @@ export function pinned(Component) {
 	return f;
 }
 
-export let MarkerPin = pinned(Marker);
-export let InfoBoxPin = pinned(InfoBox);
+export const Marker = pinned(PureMarker);
+export const Label = pinned(PureLabel);
+export const InfoBox = pinned(PureInfoBox);

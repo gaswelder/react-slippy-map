@@ -8,15 +8,20 @@ component.
 ## Basic usage
 
 ```js
-import {SlippyMap, Marker, Label} from 'react-slippy-map';
+import {SlippyMap, Marker, Label, InfoBox} from 'react-slippy-map';
 
 let coords = {latitude: 53.90824, longitude: 27.56136};
+let infoCoords = {latitude: 53.90902, longitude: 27.56200};
 
 function MyComponent() {
 	return (
 		<SlippyMap center={coords}>
+			<Label coords={coords} text="You are here"/>
 			<Marker coords={coords}/>
-			<Label coords={coords}>Howdy, Globe!</Label>
+
+			<InfoBox coords={infoCoords}>
+				<b>Howdy, Globe</b>
+			</InfoBox>
 		</SlippyMap>
 	);
 }
@@ -37,10 +42,10 @@ By default the component uses the tile server provided by Openstreetmap.
 
 ## Placing objects on the map
 
-Marker and InfoBox are "canned" map objects for demonstration purposes or for
-cases where the design is not important. For advanced cases any component can be
-placed on the map after wrapping it in the high-order component `pinned`. For
-example:
+Marker, Label and InfoBox are predefined map objects for demonstration purposes
+or for cases where the design is not important. For advanced cases any component
+can be placed on the map after wrapping it in the high-order component `pinned`.
+For example:
 
 ```js
 import {SlippyMap, pinned} from 'react-slippy-map';
