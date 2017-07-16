@@ -14,6 +14,9 @@ export {
 
 export function pinned(Component) {
 	let f = function(props) {
+		if (!props.coords) {
+			console.error(`Missing "coords" property from the pinned version of "${Component.name}"`);
+		}
 		let pinProps = props;
 		return (
 			<Pin {...pinProps}>
