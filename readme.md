@@ -14,7 +14,7 @@ let coords = {latitude: 53.90824, longitude: 27.56136};
 
 function MyComponent() {
 	return (
-		<SlippyMap>
+		<SlippyMap center={coords}>
 			<Marker coords={coords}/>
 			<Label coords={coords}>Howdy, Globe!</Label>
 		</SlippyMap>
@@ -67,9 +67,11 @@ const PinnedUserMarker = pinned(UserMarker);
 
 // ...And place it on the map
 function MapWithUser(props) {
-	return <SlippyMap>
-		<PinnedUserMarker coords={props.userCoords} title="You are here"/>
-	</SlippyMap>;
+	return (
+		<SlippyMap>
+			<PinnedUserMarker coords={props.userCoords} title="You are here"/>
+		</SlippyMap>
+	);
 }
 ```
 
@@ -87,6 +89,41 @@ function MapWithUser(props) {
 			<UserMarker title="You are here"/>
 		</Pin>
 	</SlippyMap>;
+}
+```
+
+
+## Controlling the map position
+
+The map needs the `center` property to be set to the coordinates of the central
+point in the viewport. When the user drags the map, its `onCenterChange`
+property is called with the new center coordinates as the argument. It's up to
+the parent component then to pass the new value back to the map.
+
+An example implementation of an uncontrolled map component might thus be:
+
+```js
+import React from 'react';
+import {SlippyMap} from 'react-slippy-map';
+
+class MyMap extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			center: {latitude: 53.9049, longitude: 27.5609}
+		};
+		this.onCenterChange = this.onCenterChange.bind(this);
+	}
+
+	onCenterChange(center) {
+		this.setState({center});
+	}
+
+	render() {
+		return <div style={{height: '500px'}}>
+			<SlippyMap center={this.state.center} onCenterChange={this.onCenterChange}/>
+		</div>
+	}
 }
 ```
 
