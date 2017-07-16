@@ -8,7 +8,6 @@ export default class Pin extends React.Component {
 		if (!offset || !zoom) {
 			console.error("Internal error: the pin didn't receive offset or zoom properties");
 		}
-		let divProps = propsExcept(this.props, ['coords', 'offset', 'zoom']);
 
 		// Get projection coordinates and subtract our coordinates offset.
 		let px = Projection.getX(coords.longitude, zoom) - offset.x;
@@ -20,6 +19,7 @@ export default class Pin extends React.Component {
 			top: py + 'px'
 			//transform: `translate(${x}px, ${y}px)`
 		};
+		let divProps = propsExcept(this.props, ['coords', 'offset', 'zoom']);
 		return <div {...divProps} style={style}>{this.props.children}</div>;
 	}
 }

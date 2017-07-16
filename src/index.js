@@ -17,10 +17,19 @@ export function pinned(Component) {
 		if (!props.coords) {
 			console.error(`Missing "coords" property from the pinned version of "${Component.name}"`);
 		}
-		let pinProps = props;
+		// The pin only requires coords, offset and zoom properties.
+		// The rest is for the underlying element.
+		// Remember we need offset and zoom only internally.
+		let pinKeys = ['coords', 'offset', 'zoom'];
+		let pinProps = {};
+		let restProps = Object.assign({}, props);
+		for (let k of pinKeys) {
+			pinProps[k] = props[k];
+			delete restProps[k];
+		}
 		return (
 			<Pin {...pinProps}>
-				<Component {...props}>{props.children}</Component>
+				<Component {...restProps}/>
 			</Pin>
 		);
 	};
