@@ -14,6 +14,7 @@ export default class SlippyMapWithControls extends React.Component {
 		};
 		this.zoomOut = this.zoomOut.bind(this);
 		this.zoomIn = this.zoomIn.bind(this);
+		this.onZoomChange = this.onZoomChange.bind(this);
 	}
 
 	zoomOut() {
@@ -36,11 +37,18 @@ export default class SlippyMapWithControls extends React.Component {
 		});
 	}
 
+	onZoomChange(zoom) {
+		if (zoom < this.props.minZoom || zoom > this.props.maxZoom) {
+			return;
+		}
+		this.setState({zoom});
+	}
+
 	render() {
 		let props = Object.assign({}, this.props, {zoom: this.state.zoom});
 		return (
 			<div style={containerStyle}>
-				<SlippyMap {...props}/>
+				<SlippyMap {...props} onZoomChange={this.onZoomChange}/>
 				<ZoomControl less={this.zoomOut} more={this.zoomIn}
 					min={this.props.minZoom} max={this.props.maxZoom} current={this.state.zoom}/>
 			</div>

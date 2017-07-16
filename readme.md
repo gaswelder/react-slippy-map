@@ -98,12 +98,14 @@ function MapWithUser(props) {
 ```
 
 
-## Controlling the map position
+## Controlling the map state
 
-The map needs the `center` property to be set to the coordinates of the central
-point in the viewport. When the user drags the map, its `onCenterChange`
-property is called with the new center coordinates as the argument. It's up to
-the parent component then to pass the new value back to the map.
+The map needs the `center` and `zoom` properties to be set. When the user drags
+the map, its `onCenterChange` property is called with the new center coordinates
+as the argument. When the user uses the mouse wheel, the map's `onZoomChange`
+property is called with the new zoom level as the argument. It's up to the
+parent component then to apply the new state values and pass them back to the
+map as properties.
 
 An example implementation of an uncontrolled map component might thus be:
 
@@ -115,18 +117,25 @@ class MyMap extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			center: {latitude: 53.9049, longitude: 27.5609}
+			center: {latitude: 53.9049, longitude: 27.5609},
+			zoom: 10
 		};
 		this.onCenterChange = this.onCenterChange.bind(this);
+		this.onZoomChange = this.onZoomChange.bind(this);
 	}
 
 	onCenterChange(center) {
 		this.setState({center});
 	}
 
+	onZoomChange(zoom) {
+		this.setState({zoom});
+	}
+
 	render() {
 		return <div style={{height: '500px'}}>
-			<SlippyMap center={this.state.center} onCenterChange={this.onCenterChange}/>
+			<SlippyMap center={this.state.center} onCenterChange={this.onCenterChange}
+				zoom={this.state.zoom} onZoomChange={this.onZoomChange}/>
 		</div>
 	}
 }
