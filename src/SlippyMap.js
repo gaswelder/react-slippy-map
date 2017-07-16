@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Projection from './mercator';
 import DraggableDiv from './DraggableDiv';
-import ObjectsLayer from './ObjectsLayer';
 import TilesLayer from './TilesLayer';
 
 
@@ -165,15 +164,21 @@ export default class SlippyMap extends React.Component {
 					zoom={this.props.zoom}
 					area={this.area()}
 					offset={offset}/>
-				<ObjectsLayer
-					zoom={this.props.zoom}
-					objects={this.props.children}
-					offset={offset}/>
+				<div className="objects-container">
+					{React.Children.map(this.props.children, function(ch, i) {
+						return withProps(ch, {offset, zoom}, i);
+					})}
+				</div>
 			</DraggableDiv>
 		);
 	}
 }
 
+function withProps(ch, more, key) {
+	let props = Object.assign({}, ch.props, more);
+	let C = ch.type;
+	return <C key={key} {...props}>{ch.props.children}</C>;
+}
 
 function noop() {}
 
