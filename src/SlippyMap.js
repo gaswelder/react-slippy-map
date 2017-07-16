@@ -165,19 +165,16 @@ export default class SlippyMap extends React.Component {
 					area={this.area()}
 					offset={offset}/>
 				<div className="objects-container">
-					{React.Children.map(this.props.children, function(ch, i) {
-						return withProps(ch, {offset, zoom}, i);
+					{React.Children.map(this.props.children, function(child, i) {
+						// Render the same thing, but add offset and zoom properties
+						// for internal purposes.
+						let ChildElement = child.type;
+						return <ChildElement key={i} {...child.props} offset={offset} zoom={zoom}/>;
 					})}
 				</div>
 			</DraggableDiv>
 		);
 	}
-}
-
-function withProps(ch, more, key) {
-	let props = Object.assign({}, ch.props, more);
-	let C = ch.type;
-	return <C key={key} {...props}>{ch.props.children}</C>;
 }
 
 function noop() {}
