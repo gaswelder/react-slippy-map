@@ -4,6 +4,8 @@ From-scratch implementation of a "web mercator"-projected slippy map. This is
 not a wrapper around an existing old-style map widget, but a real React
 component.
 
+A demo (for desktop Firefox and Chrome): https://gaswelder.github.io/react-slippy-map/demo/
+
 
 ## Basic usage
 
