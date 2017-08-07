@@ -28,6 +28,6 @@
     "react-dom": "^15.5.4"
   },
   "scripts": {
-    "prepare": "webpack -p"
+    "prepublish": "webpack -p"
   }
 }
