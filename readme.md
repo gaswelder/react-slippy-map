@@ -166,6 +166,8 @@ function View() {
 }
 ```
 
+Note that `center` still has to be controlled when using this component.
+
 
 ## Clusters
 

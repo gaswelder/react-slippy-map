@@ -90,14 +90,12 @@ function renderOrdersCluster(cluster) {
 	return <div style={orderStyle}>{cluster.objects.length}</div>;
 }
 
-
 class Test extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			lat: 53.9049,
-			lon: 27.5609,
-			zoom: 13
+			lon: 27.5609
 		};
 		this.onCenterChange = this.onCenterChange.bind(this);
 	}
@@ -117,9 +115,10 @@ class Test extends React.Component {
 
 		return (
 			<div style={{height: '500px'}}>
-				<SlippyMapWithControls center={center} zoom={this.state.zoom}
-					onCenterChange={this.onCenterChange}
+				<SlippyMapWithControls defaultZoom={13}
+					center={center} onCenterChange={this.onCenterChange}
 					baseTilesUrl="https://b.tile.openstreetmap.org">
+
 					<Clusters objects={orders} render={renderOrdersCluster}/>
 					<Clusters objects={drivers} render={renderDriverCluster}/>
 
