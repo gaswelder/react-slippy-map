@@ -2,7 +2,7 @@ module.exports = {
 	entry: './app.js',
 	output: {
 		path: __dirname,
-		filename: 'app.bin.js'
+		filename: 'demo.bin.js'
 	},
 	module: {
 		rules: [
