@@ -46,6 +46,9 @@ export default class SlippyMapWithControls extends React.Component {
 
 	render() {
 		let props = Object.assign({}, this.props, {zoom: this.state.zoom});
+		for (let k in SlippyMapWithControls.defaultProps) {
+			delete props[k];
+		}
 		return (
 			<div style={containerStyle}>
 				<SlippyMap {...props} onZoomChange={this.onZoomChange}/>
