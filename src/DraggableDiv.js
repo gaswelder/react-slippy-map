@@ -18,6 +18,18 @@ export default class DraggableDiv extends React.Component {
 		this.onClick = this.onClick.bind(this);
 	}
 
+	preventSelection(e) {
+		e.preventDefault();
+	}
+
+	componentDidMount() {
+		this.element.addEventListener("selectstart", this.preventSelection);
+	}
+
+	componentWillUnmount() {
+		this.element.removeEventListener("selectstart", this.preventSelection);
+	}
+
 	onMouseDown(event) {
 		this.setState({
 			mouseDown: true,
@@ -77,7 +89,7 @@ export default class DraggableDiv extends React.Component {
 		delete otherProps.onMove;
 
 		return (
-			<div
+			<div ref={d => {this.element = d}}
 				onMouseDown={this.onMouseDown}
 				onMouseUp={this.onMouseUp}
 				onMouseMove={this.onMouseMove}
