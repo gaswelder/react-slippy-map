@@ -81,6 +81,7 @@ export default class DraggableDiv extends React.Component {
 				onMouseDown={this.onMouseDown}
 				onMouseUp={this.onMouseUp}
 				onMouseMove={this.onMouseMove}
+				onMouseLeave={this.onMouseUp}
 				onClick={this.onClick}
 				onDragStart={(e) => e.preventDefault()}
 				{...otherProps}>{this.props.children}</div>
