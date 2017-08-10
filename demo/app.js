@@ -115,7 +115,7 @@ class Test extends React.Component {
 
 		return (
 			<div style={{height: '500px'}}>
-				<SlippyMapWithControls defaultZoom={13}
+				<SlippyMapWithControls defaultZoom={13} zoomStep={0.1}
 					center={center} onCenterChange={this.onCenterChange}
 					baseTilesUrl="https://b.tile.openstreetmap.org">
 

@@ -16,7 +16,6 @@ export default class SlippyMap extends React.Component {
 
 		this.onClick = this.onClick.bind(this);
 		this.onDrag = this.onDrag.bind(this);
-		this.onWheel = this.onWheel.bind(this);
 	}
 
 	// When the map is mounted, we can get its container via ref
@@ -101,25 +100,6 @@ export default class SlippyMap extends React.Component {
 		this.props.onCenterChange(newCenterCoords);
 	}
 
-	// Preprocesses mousewheel converting them to zoom change events
-	// and calls the listener.
-	onWheel(event) {
-		// If there is no zoom listener, don't bother.
-		if (!this.props.onZoomChange) {
-			return;
-		}
-
-		// Throttle barrier
-		if (this.ignoreWheelUntil && event.timeStamp < this.ignoreWheelUntil) {
-			return;
-		}
-		this.ignoreWheelUntil = event.timeStamp + 500;
-
-		// Call the listener with the new zoom level
-		let delta = event.deltaY < 0 ? 1 : -1;
-		this.props.onZoomChange(this.props.zoom + delta);
-	}
-
 	render() {
 		let style = {
 			minHeight: '1em',
@@ -178,7 +158,7 @@ export default class SlippyMap extends React.Component {
 		};
 
 		return (
-			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag} onWheel={this.onWheel}>
+			<DraggableDiv style={layerStyle} onClick={this.onClick} onMove={this.onDrag} onWheel={this.props.onWheel}>
 				<TilesLayer
 					baseUrl={this.props.baseTilesUrl}
 					zoom={this.props.zoom}
@@ -203,5 +183,6 @@ SlippyMap.defaultProps = {
 	zoom: 16,
 	center: {latitude: 53.9049, longitude: 27.5609},
 	onCenterChange: noop,
-	onClick: noop
+	onClick: noop,
+	onWheel: noop
 };

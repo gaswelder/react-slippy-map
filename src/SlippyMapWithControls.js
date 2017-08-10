@@ -14,12 +14,12 @@ export default class SlippyMapWithControls extends React.Component {
 		};
 		this.zoomOut = this.zoomOut.bind(this);
 		this.zoomIn = this.zoomIn.bind(this);
-		this.onZoomChange = this.onZoomChange.bind(this);
+		this.onWheel = this.onWheel.bind(this);
 	}
 
 	zoomOut() {
 		this.setState(function(s) {
-			let zoom = s.zoom - 1;
+			let zoom = Math.round((s.zoom - this.props.zoomStep)*100)/100;
 			if (zoom < this.props.minZoom) {
 				zoom = this.props.minZoom;
 			}
@@ -29,7 +29,7 @@ export default class SlippyMapWithControls extends React.Component {
 
 	zoomIn() {
 		this.setState(function(s) {
-			let zoom = s.zoom + 1;
+			let zoom = Math.round((s.zoom + this.props.zoomStep)*100)/100;
 			if (zoom > this.props.maxZoom) {
 				zoom = this.props.maxZoom;
 			}
@@ -37,11 +37,14 @@ export default class SlippyMapWithControls extends React.Component {
 		});
 	}
 
-	onZoomChange(zoom) {
-		if (zoom < this.props.minZoom || zoom > this.props.maxZoom) {
+	onWheel(event) {
+		// Throttle barrier
+		if (this.ignoreWheelUntil && event.timeStamp < this.ignoreWheelUntil) {
 			return;
 		}
-		this.setState({zoom});
+		this.ignoreWheelUntil = event.timeStamp + 50;
+
+		event.deltaY > 0 ? this.zoomOut() : this.zoomIn();
 	}
 
 	render() {
@@ -51,7 +54,7 @@ export default class SlippyMapWithControls extends React.Component {
 		}
 		return (
 			<div style={containerStyle}>
-				<SlippyMap {...props} onZoomChange={this.onZoomChange}/>
+				<SlippyMap {...props} onWheel={this.onWheel}/>
 				<ZoomControl less={this.zoomOut} more={this.zoomIn}
 					min={this.props.minZoom} max={this.props.maxZoom} current={this.state.zoom}/>
 			</div>
@@ -62,7 +65,8 @@ export default class SlippyMapWithControls extends React.Component {
 SlippyMapWithControls.defaultProps = {
 	minZoom: 0,
 	defaultZoom: 14,
-	maxZoom: 18
+	maxZoom: 18,
+	zoomStep: 1
 };
 
 

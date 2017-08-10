@@ -17,7 +17,7 @@ let infoCoords = {latitude: 53.90902, longitude: 27.56200};
 
 function MyComponent() {
 	return (
-		<SlippyMap center={coords}>
+		<SlippyMap center={coords} zoom={16}>
 			<Label coords={coords} text="You are here"/>
 			<Marker coords={coords}/>
 
@@ -31,6 +31,10 @@ function MyComponent() {
 
 The map component has width and height assigned to 100%, thus its size is
 controlled by the size of its container.
+
+ The two main properties of the SlippyMap are `center` and `zoom`. `zoom`
+ changes from 0 to whatever level is supported by the tile server. The typical
+ maximum is 18. Fractional zoom levels are supported too.
 
 
 ## Map tiles
@@ -104,8 +108,8 @@ function MapWithUser(props) {
 
 The map needs the `center` and `zoom` properties to be set. When the user drags
 the map, its `onCenterChange` property is called with the new center coordinates
-as the argument. When the user uses the mouse wheel, the map's `onZoomChange`
-property is called with the new zoom level as the argument. It's up to the
+as the argument. When the user uses the mouse wheel, the map's `onWheel`
+property is called with the wheel event as the argument. It's up to the
 parent component then to apply the new state values and pass them back to the
 map as properties.
 
@@ -123,21 +127,24 @@ class MyMap extends React.Component {
 			zoom: 10
 		};
 		this.onCenterChange = this.onCenterChange.bind(this);
-		this.onZoomChange = this.onZoomChange.bind(this);
+		this.onWheel = this.onWheel.bind(this);
 	}
 
 	onCenterChange(center) {
 		this.setState({center});
 	}
 
-	onZoomChange(zoom) {
-		this.setState({zoom});
+	onWheel(event) {
+		this.setState(function(state) {
+			let delta = event.deltaY > 0 ? -1 : 1;
+			return {zoom: state.zoom + delta};
+		});
 	}
 
 	render() {
 		return <div style={{height: '500px'}}>
 			<SlippyMap center={this.state.center} onCenterChange={this.onCenterChange}
-				zoom={this.state.zoom} onZoomChange={this.onZoomChange}/>
+				zoom={this.state.zoom} onWheel={this.onWheel}/>
 		</div>
 	}
 }
@@ -154,15 +161,15 @@ with the state transition.
 But often simple controls are just what's needed by the developer, and if zoom
 level isn't going to be controlled by the parent, then there's the
 `SlippyMapWithControls` component. It accepts the same properties as the base
-component, except `zoom`, and additionally it accepts `defaultZoom`, `minZoom`
-and `maxZoom` properties.
+component, except `zoom`, and additionally it accepts `defaultZoom`, `minZoom`,
+`maxZoom` and `zoomStep` properties.
 
 ```js
 import {SlippyMapWithControls as Map} from 'react-slippy-map'
 
 function View() {
 	let props = {...} // Props normally used for the basic SlippyMap
-	return <Map defaultZoom={16} minZoom={0} maxZoom={20} {...props}/>;
+	return <Map defaultZoom={16} minZoom={0} maxZoom={20} zoomStep={0.1} {...props}/>;
 }
 ```
 
