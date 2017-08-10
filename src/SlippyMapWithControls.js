@@ -42,7 +42,9 @@ export default class SlippyMapWithControls extends React.Component {
 		if (this.ignoreWheelUntil && event.timeStamp < this.ignoreWheelUntil) {
 			return;
 		}
-		this.ignoreWheelUntil = event.timeStamp + 50;
+		let delay = 33 + this.props.zoomStep * 166;
+		if (delay > 200) delay = 200;
+		this.ignoreWheelUntil = event.timeStamp + delay;
 
 		event.deltaY > 0 ? this.zoomOut() : this.zoomIn();
 	}
