@@ -13,7 +13,7 @@ export default class SlippyMap extends React.Component {
       containerSize: [0, 0]
     };
 
-    this.onClick = this.onClick.bind(this);
+    this.handleClick = this.handleClick.bind(this);
     this.onDrag = this.onDrag.bind(this);
   }
 
@@ -73,15 +73,17 @@ export default class SlippyMap extends React.Component {
 
   // Processes click events and passes the to the listener in
   // the props.
-  onClick(event) {
-    // If there is no listeners, then why bother.
+  handleClick(event) {
+    // If there is no listener, then why bother.
     if (!this.props.onClick) {
       return;
     }
 
     // Find out the click event's offset from the center.
-    let x = event.pageX - this._container.offsetLeft;
-    let y = event.pageY - this._container.offsetTop;
+    const rect = this._container.getBoundingClientRect();
+    const x = event.pageX - rect.x;
+    const y = event.pageY - rect.y;
+
     let [w, h] = this.halfSize();
     let dx = x - w;
     let dy = y - h;
@@ -170,7 +172,7 @@ export default class SlippyMap extends React.Component {
     return (
       <DraggableDiv
         style={layerStyle}
-        onClick={this.onClick}
+        onClick={this.handleClick}
         onMove={this.onDrag}
         onWheel={this.props.onWheel}
       >
