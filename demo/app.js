@@ -1,13 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {
-  SlippyMapWithControls,
-  pinned,
-  Clusters,
-  Label,
-  Marker,
-  Path
-} from "../src";
+import { SlippyMapWithControls, Clusters, Label, Marker, Path } from "../src";
 
 const drivers = [
   { id: "2606", coords: { latitude: 53.938787, longitude: 27.584183 } },
@@ -83,83 +76,93 @@ function renderOrdersCluster(cluster) {
   return <div style={orderStyle}>{cluster.objects.length}</div>;
 }
 
-const Corner = pinned(function(props) {
-  // console.log({ props });
-  return <div>corner {props.i}</div>;
-});
-
 function House(props) {
   const { points } = props;
-  // console.log({ points });
-  if (points.length < 2) {
-    return <Path key={"path"} points={points} />;
-  }
 
-  const lines = [];
-
-  lines.push(<Path key={"path"} points={points} />);
-
-  for (let i = 1; i < points.length; i++) {
-    const from = points[i - 1];
-    const to = points[i];
-    lines.push(<Corner key={"from" + i} coords={from} i={i - 1} />);
-    lines.push(<Corner key={"to" + i} coords={to} i={i} />);
-  }
-
-  return lines;
+  return <Path points={points} />;
 }
 
 class Test extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // lat: 53.9049,
-      // lon: 27.5609,
-      lat: 53.8827637,
-      lon: 27.890273,
-      // housePoints: [{ latitude: 53.9049, longitude: 27.5609 }]
-      housePoints: []
+      center: user.coords,
+      houses: [],
+      newHousePoints: []
     };
     this.onCenterChange = this.onCenterChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleDiscardClick = this.handleDiscardClick.bind(this);
+    this.handleFinishClick = this.handleFinishClick.bind(this);
   }
 
-  onCenterChange(coords) {
-    this.setState({
-      lat: coords.latitude,
-      lon: coords.longitude
-    });
+  onCenterChange(center) {
+    this.setState({ center });
   }
 
   handleClick(coords) {
-    console.log(coords);
-    this.setState(s => ({ housePoints: s.housePoints.concat(coords) }));
+    this.setState(s => ({ newHousePoints: s.newHousePoints.concat(coords) }));
+  }
+
+  handleFinishClick() {
+    if (this.state.newHousePoints.length == 0) {
+      return;
+    }
+
+    this.setState(s => ({
+      houses: s.houses.concat([s.newHousePoints]),
+      newHousePoints: []
+    }));
+  }
+
+  handleDiscardClick() {
+    this.setState({
+      newHousePoints: []
+    });
   }
 
   render() {
-    let center = {
-      latitude: this.state.lat,
-      longitude: this.state.lon
-    };
+    const { houses, newHousePoints, center } = this.state;
+    const houseInProgress = this.state.newHousePoints.length > 0;
 
     return (
-      <div style={{ height: "500px" }}>
-        <SlippyMapWithControls
-          defaultZoom={18}
-          zoomStep={0.1}
-          center={center}
-          onCenterChange={this.onCenterChange}
-          baseTilesUrl="https://b.tile.openstreetmap.org"
-          onClick={this.handleClick}
-        >
-          <Clusters objects={orders} render={renderOrdersCluster} />
-          <Clusters objects={drivers} render={renderDriverCluster} />
+      <React.Fragment>
+        <div style={{ height: "500px" }}>
+          <SlippyMapWithControls
+            defaultZoom={18}
+            zoomStep={0.1}
+            center={center}
+            onCenterChange={this.onCenterChange}
+            baseTilesUrl="https://b.tile.openstreetmap.org"
+            onClick={this.handleClick}
+          >
+            <Clusters objects={orders} render={renderOrdersCluster} />
+            <Clusters objects={drivers} render={renderDriverCluster} />
 
-          <Label text="You are here" coords={user.coords} />
-          <Marker coords={user.coords} />
-          <House points={this.state.housePoints} />
-        </SlippyMapWithControls>
-      </div>
+            <Label text="You are here" coords={user.coords} />
+            <Marker coords={user.coords} />
+
+            {houses.map((points, i) => (
+              <House key={i} points={points} />
+            ))}
+            <House points={newHousePoints} />
+          </SlippyMapWithControls>
+        </div>
+        <button
+          type="button"
+          disabled={!houseInProgress}
+          onClick={this.handleFinishClick}
+        >
+          Finish
+        </button>
+        <button
+          type="button"
+          disabled={!houseInProgress}
+          onClick={this.handleDiscardClick}
+        >
+          Discard
+        </button>
+      </React.Fragment>
     );
   }
 }
