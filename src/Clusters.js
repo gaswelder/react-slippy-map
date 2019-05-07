@@ -1,13 +1,13 @@
-import React from 'react';
-import Projection from './mercator';
-import Pin from './Pin';
-import {Marker} from './elements';
+import React from "react";
+import Projection from "./mercator";
+import Pin from "./Pin";
+import { Marker } from "./elements";
 
 function defaultRender(cluster) {
-	if (cluster.objects.length == 1) {
-		return <Marker/>;
-	}
-	return <Marker color="red"/>;
+  if (cluster.objects.length == 1) {
+    return <Marker />;
+  }
+  return <Marker color="red" />;
 }
 
 // A clustering container for map objects. Reorganizes its
@@ -15,88 +15,91 @@ function defaultRender(cluster) {
 // into generic cluster markers. Children that didn't get
 // into any cluster are rendered without changes.
 export default class Clusters extends React.PureComponent {
-	render() {
-		let {offset, zoom, threshold, objects} = this.props;
-		let dist = pixelDistance.bind(undefined, zoom);
-		let render = this.props.render;
+  render() {
+    let { offset, zoom, threshold, objects } = this.props;
+    let dist = pixelDistance.bind(undefined, zoom);
+    let render = this.props.render;
 
-		// Get an array of clusters.
-		let clusters = clusterizeObjects(objects, dist, threshold);
+    // Get an array of clusters.
+    let clusters = clusterizeObjects(objects, dist, threshold);
 
-		// Convert clusters to pinnable components
-		let markers = clusters.map(function(cluster, i) {
-			let renderedCluster = render(cluster);
+    // Convert clusters to pinnable components
+    let markers = clusters.map(function(cluster, i) {
+      let renderedCluster = render(cluster);
 
-			// A common mistake is to pass a pinned component as a cluster
-			// rendering. This causes an error, which we avoid by getting
-			// to the existing pin.
-			if (renderedCluster.type._isPinned) {
-				let props = Object.assign({}, renderedCluster.props, {offset, zoom}, {coords: cluster.coords});
-				let PinnedContent = renderedCluster.type;
-				return <PinnedContent key={i} {...props}/>;
-			}
-			return <Pin key={i} {...{offset, zoom}} coords={cluster.coords}>{renderedCluster}</Pin>;
-			//return withProps(renderedCluster, {zoom, offset}, i);
-		});
+      // A common mistake is to pass a pinned component as a cluster
+      // rendering. This causes an error, which we avoid by getting
+      // to the existing pin.
+      if (renderedCluster.type._isPinned) {
+        let props = Object.assign(
+          {},
+          renderedCluster.props,
+          { offset, zoom },
+          { coords: cluster.coords }
+        );
+        let PinnedContent = renderedCluster.type;
+        return <PinnedContent key={i} {...props} />;
+      }
+      return (
+        <Pin key={i} {...{ offset, zoom }} coords={cluster.coords}>
+          {renderedCluster}
+        </Pin>
+      );
+      //return withProps(renderedCluster, {zoom, offset}, i);
+    });
 
-		return <div>{markers}</div>;
-	}
+    return <div>{markers}</div>;
+  }
 }
 
 Clusters.defaultProps = {
-	threshold: 20,
-	objects: [],
-	render: defaultRender
+  threshold: 20,
+  objects: [],
+  render: defaultRender
 };
-
-function withProps(ch, more, key) {
-	let props = Object.assign({}, ch.props, more);
-	let C = ch.type;
-	return <C key={key} {...props}>{ch.props.children}</C>;
-}
 
 // Returns distance in pixels between two
 // geopoints.
 function pixelDistance(zoom, p1, p2) {
-	let r1 = projectionCoords(p1, zoom);
-	let r2 = projectionCoords(p2, zoom);
-	let dx = r1[0] - r2[0];
-	let dy = r1[1] - r2[1];
-	return Math.sqrt(dx*dx + dy*dy);
+  let r1 = projectionCoords(p1, zoom);
+  let r2 = projectionCoords(p2, zoom);
+  let dx = r1[0] - r2[0];
+  let dy = r1[1] - r2[1];
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 // Returns coordinates on the projection sufrace
 // for the given point at given zoom level.
 function projectionCoords(point, zoom) {
-	return [
-		Projection.getX(point.longitude, zoom),
-		Projection.getY(point.latitude, zoom)
-	];
+  return [
+    Projection.getX(point.longitude, zoom),
+    Projection.getY(point.latitude, zoom)
+  ];
 }
 
 // Takes an array of objects and returns an array of clusters.
 // Each object must have a `coords` field with {latitude, longitude} values.
 function clusterizeObjects(objects, distance, threshold) {
-	// Create a array of points to give to the algorithm.
-	// Keep references to the markers on the points.
-	let points = objects.map(function(object) {
-		// We need to give a plain point to the function
-		// below, but keep a reference to the full objects.
-		// Instead of mutating the coords themselves, give
-		// a copy.
-		let point = Object.assign({}, object.coords);
-		point.object = object;
-		return point;
-	});
+  // Create a array of points to give to the algorithm.
+  // Keep references to the markers on the points.
+  let points = objects.map(function(object) {
+    // We need to give a plain point to the function
+    // below, but keep a reference to the full objects.
+    // Instead of mutating the coords themselves, give
+    // a copy.
+    let point = Object.assign({}, object.coords);
+    point.object = object;
+    return point;
+  });
 
-	let clusters = clusterize(points, distance, threshold);
+  let clusters = clusterize(points, distance, threshold);
 
-	return clusters.map(function(cluster) {
-		return {
-			objects: cluster.map(point => point.object),
-			coords: cluster.center
-		};
-	});
+  return clusters.map(function(cluster) {
+    return {
+      objects: cluster.map(point => point.object),
+      coords: cluster.center
+    };
+  });
 }
 
 // A simple greedy algorithm to merge points into clusters.
@@ -106,45 +109,47 @@ function clusterizeObjects(objects, distance, threshold) {
 // * threshold is the distance threshold for the clustering, in the
 //   same units as the distance.
 function clusterize(points, distance, threshold) {
-	// Create a list of clusters, each with a single marker in it.
-	let clusters = points.map(p => [p]);
+  // Create a list of clusters, each with a single marker in it.
+  let clusters = points.map(p => [p]);
 
-	// Go through each pair of clusters.
-	for (let i = 0; i < clusters.length - 1; i++) {
-		let c1 = clusters[i];
-		if (!c1) continue;
-		for (let j = i + 1; j < clusters.length; j++) {
-			let c2 = clusters[j];
-			if (!c2) continue;
+  // Go through each pair of clusters.
+  for (let i = 0; i < clusters.length - 1; i++) {
+    let c1 = clusters[i];
+    if (!c1) continue;
+    for (let j = i + 1; j < clusters.length; j++) {
+      let c2 = clusters[j];
+      if (!c2) continue;
 
-			// If this pair of clusters is close enough, merge them
-			// into a new cluster. Put the new cluster at the end
-			// of the list and "delete" these two.
-			if (distance(center(c1), center(c2)) < threshold) {
-				clusters.push(c1.concat(c2));
-				clusters[i] = null;
-				clusters[j] = null;
-				break;
-			}
-		}
-	}
+      // If this pair of clusters is close enough, merge them
+      // into a new cluster. Put the new cluster at the end
+      // of the list and "delete" these two.
+      if (distance(center(c1), center(c2)) < threshold) {
+        clusters.push(c1.concat(c2));
+        clusters[i] = null;
+        clusters[j] = null;
+        break;
+      }
+    }
+  }
 
-	return clusters.filter(x => x).map(function(c) {
-		c.center = center(c);
-		return c;
-	});
+  return clusters
+    .filter(x => x)
+    .map(function(c) {
+      c.center = center(c);
+      return c;
+    });
 }
 
 // Calculates center for the given cluster.
 function center(cluster) {
-	let lat = 0;
-	let lon = 0;
-	for (let m of cluster) {
-		lat += m.latitude;
-		lon += m.longitude;
-	}
-	return {
-		latitude: lat / cluster.length,
-		longitude: lon / cluster.length
-	};
+  let lat = 0;
+  let lon = 0;
+  for (let m of cluster) {
+    lat += m.latitude;
+    lon += m.longitude;
+  }
+  return {
+    latitude: lat / cluster.length,
+    longitude: lon / cluster.length
+  };
 }
