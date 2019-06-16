@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { SlippyMapWithControls, Clusters, Label, Marker, Path } from "../src";
+import { SlippyMap, Clusters, Label, Marker, Path } from "../src/index.js";
 
 const drivers = [
   { id: "2606", coords: { latitude: 53.938787, longitude: 27.584183 } },
@@ -86,18 +86,12 @@ class Test extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      center: user.coords,
       houses: [],
       newHousePoints: []
     };
-    this.onCenterChange = this.onCenterChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleDiscardClick = this.handleDiscardClick.bind(this);
     this.handleFinishClick = this.handleFinishClick.bind(this);
-  }
-
-  onCenterChange(center) {
-    this.setState({ center });
   }
 
   handleClick(coords) {
@@ -122,17 +116,16 @@ class Test extends React.Component {
   }
 
   render() {
-    const { houses, newHousePoints, center } = this.state;
+    const { houses, newHousePoints } = this.state;
     const houseInProgress = this.state.newHousePoints.length > 0;
 
     return (
       <React.Fragment>
         <div style={{ height: "500px" }}>
-          <SlippyMapWithControls
+          <SlippyMap
+            defaultCenter={user.coords}
             defaultZoom={18}
             zoomStep={0.1}
-            center={center}
-            onCenterChange={this.onCenterChange}
             baseTilesUrl="https://b.tile.openstreetmap.org"
             onClick={this.handleClick}
           >
@@ -146,7 +139,7 @@ class Test extends React.Component {
               <House key={i} points={points} />
             ))}
             <House points={newHousePoints} />
-          </SlippyMapWithControls>
+          </SlippyMap>
         </div>
         <button
           type="button"

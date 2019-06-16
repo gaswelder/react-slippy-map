@@ -2,7 +2,6 @@ import React from "react";
 import Clusters from "./Clusters";
 import Pin from "./Pin";
 import SlippyMap from "./SlippyMap";
-import SlippyMapWithControls from "./SlippyMapWithControls";
 import {
   Marker as PureMarker,
   Label as PureLabel,
@@ -10,7 +9,7 @@ import {
 } from "./elements";
 import Path from "./Path";
 
-export { Clusters, Pin, SlippyMap, SlippyMapWithControls, Path };
+export { Clusters, Pin, SlippyMap, Path };
 
 export function pinned(Component) {
   let f = function(props) {

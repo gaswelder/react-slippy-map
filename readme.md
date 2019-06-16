@@ -93,19 +93,16 @@ controlled by the size of its container.
 The properties are:
 
 - required `baseTilesUrl`
-- required `center: { latitude:number, longitude:number }`
-- `onCenterChange` - called with `{latitude, longitude}` every time dragging occurs; this is necessary so that the parent component can update the current center of the map
-- `children`
+- `center: { latitude:number, longitude:number }`
+- `onCenterChange` - called with `{latitude, longitude}` every time the user drags the map
+- `children` - content like markers and boxes
 - `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider; can be fractional (in that case the closest zoom's tiles are scaled)
 - `onClick` - function that is called on click events on the map; receives a `{latitude, longitude}` object as the argument
-- `onWheel`
+- `onWheel` - called with the wheel event as the argument when the user uses the mouse wheel
 
-The map needs the `center` and `zoom` properties to be set. When the user drags
-the map, its `onCenterChange` property is called with the new center coordinates
-as the argument. When the user uses the mouse wheel, the map's `onWheel`
-property is called with the wheel event as the argument. It's up to the
-parent component then to apply the new state values and pass them back to the
-map as properties.
+If `center` is not set, the map starts at `defaultCenter` and takes care of controlling this prop itself.
+If `zoom` is not set, the map starts at `defaultZoom`, renders additionally zoom in/out buttons and controls the zoom itself.
+Additionally, `minZoom`, `maxZoom` and `zoomStep` props are taken into account by the zoom buttons.
 
 ## `Path`
 
@@ -116,7 +113,7 @@ map as properties.
 
 ## Controlling the map state
 
-An example implementation of an uncontrolled map component might thus be:
+An example of controlling the map:
 
 ```js
 import React from "react";
@@ -158,30 +155,6 @@ class MyMap extends React.Component {
   }
 }
 ```
-
-## Zoom controls
-
-The main `SlippyMap` component is fully controlled, and both center and zoom
-level have to be provided to it and maintaned by the parent component. That
-means, the usual "+/-" buttons have to be implemented by the developer along
-with the state transition.
-
-But often simple controls are just what's needed by the developer, and if zoom
-level isn't going to be controlled by the parent, then there's the
-`SlippyMapWithControls` component. It accepts the same properties as the base
-component, except `zoom`, and additionally it accepts `defaultZoom`, `minZoom`,
-`maxZoom` and `zoomStep` properties.
-
-```js
-import {SlippyMapWithControls as Map} from 'react-slippy-map'
-
-function View() {
-	let props = {...} // Props normally used for the basic SlippyMap
-	return <Map defaultZoom={16} minZoom={0} maxZoom={20} zoomStep={0.1} {...props}/>;
-}
-```
-
-Note that `center` still has to be controlled when using this component.
 
 ## Clusters
 
