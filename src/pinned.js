@@ -1,10 +1,11 @@
 import React from "react";
 import Pin from "./Pin";
+import report from "./report";
 
 export default function pinned(Component) {
   let f = function(props) {
     if (!props.coords) {
-      console.error(
+      report.internalFault(
         `Missing "coords" property from the pinned version of "${
           Component.name
         }"`
