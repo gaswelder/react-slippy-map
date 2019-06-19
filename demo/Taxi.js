@@ -76,7 +76,21 @@ function renderOrdersCluster(cluster) {
 }
 
 class Taxi extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      showLabel: true
+    };
+    this.toggleLabel = this.toggleLabel.bind(this);
+  }
+
+  toggleLabel() {
+    this.setState(ps => ({ showLabel: !ps.showLabel }));
+  }
+
   render() {
+    const { showLabel } = this.state;
+
     return (
       <SlippyMap
         defaultCenter={user.coords}
@@ -87,8 +101,8 @@ class Taxi extends React.Component {
         <Clusters objects={orders} render={renderOrdersCluster} />
         <Clusters objects={drivers} render={renderDriverCluster} />
 
-        <Label text="You are here" coords={user.coords} />
-        <Marker coords={user.coords} />
+        {showLabel && <Label text="You are here" coords={user.coords} />}
+        <Marker coords={user.coords} onClick={this.toggleLabel} />
       </SlippyMap>
     );
   }
