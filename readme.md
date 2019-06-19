@@ -28,8 +28,30 @@ function MyComponent() {
 }
 ```
 
-It's possible to use the `Pin` component and put any content
-inside of it:
+## `SlippyMap`
+
+`SlippyMap` is the main component that actually draws the map with tiles.
+
+The map component has width and height assigned to 100%, thus its size is
+controlled by the size of its container.
+
+The properties are:
+
+- required `baseTilesUrl`
+- `center: { latitude:number, longitude:number }`
+- `onCenterChange` - called with `{latitude, longitude}` every time the user drags the map
+- `children` - content like markers and boxes
+- `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider; can be fractional (in that case the closest zoom's tiles are scaled)
+- `onClick` - function that is called on click events on the map; receives a `{latitude, longitude}` object as the argument
+- `onWheel` - called with the wheel event as the argument when the user uses the mouse wheel
+
+If `center` is not set, the map starts at `defaultCenter` and takes care of controlling this prop itself.
+If `zoom` is not set, the map starts at `defaultZoom`, renders additionally zoom in/out buttons and controls the zoom itself.
+Additionally, `minZoom`, `maxZoom` and `zoomStep` props are taken into account by the zoom buttons.
+
+## `Pin`
+
+`Pin` is a generic container for any content that can be put on the map.
 
 ```js
 import { SlippyMap, Pin } from "react-slippy-map";
@@ -83,33 +105,21 @@ function MapWithUser(props) {
 }
 ```
 
-## `SlippyMap`
-
-`SlippyMap` is the main component that actually draws the map with tiles.
-
-The map component has width and height assigned to 100%, thus its size is
-controlled by the size of its container.
-
-The properties are:
-
-- required `baseTilesUrl`
-- `center: { latitude:number, longitude:number }`
-- `onCenterChange` - called with `{latitude, longitude}` every time the user drags the map
-- `children` - content like markers and boxes
-- `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider; can be fractional (in that case the closest zoom's tiles are scaled)
-- `onClick` - function that is called on click events on the map; receives a `{latitude, longitude}` object as the argument
-- `onWheel` - called with the wheel event as the argument when the user uses the mouse wheel
-
-If `center` is not set, the map starts at `defaultCenter` and takes care of controlling this prop itself.
-If `zoom` is not set, the map starts at `defaultZoom`, renders additionally zoom in/out buttons and controls the zoom itself.
-Additionally, `minZoom`, `maxZoom` and `zoomStep` props are taken into account by the zoom buttons.
-
 ## `Path`
 
 `Path` renders as a polyline on the map.
 
 - required `points` - array of `{latitude, longitude}` objects
 - `color = "orange"` - color of the line
+
+## Canned components
+
+"Canned components" are components that could be easily made as wrappers around the `Pin` component but are provided anyway for the laziest of us.
+These are:
+
+- `<Marker coords={...} />`
+- `<InfoBox coords={...}>{content}</InfoBox>`
+- `<Label coords={...} text={...} />`
 
 ## Controlling the map state
 

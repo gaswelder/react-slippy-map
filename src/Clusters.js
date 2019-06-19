@@ -1,7 +1,7 @@
 import React from "react";
 import Projection from "./mercator";
 import Pin from "./Pin";
-import { Marker } from "./elements";
+import Marker from "./canned/Marker";
 
 function defaultRender(cluster) {
   if (cluster.objects.length == 1) {
