@@ -118,8 +118,12 @@ function MapWithUser(props) {
 These are:
 
 - `<Marker coords={...} />`
-- `<InfoBox coords={...}>{content}</InfoBox>`
-- `<Label coords={...} text={...} />`
+- `<InfoBox coords={...} up>{content}</InfoBox>`
+- `<Label coords={...} up text={...} />`
+
+The `up` property makes the label or infobox look "up" from the pin instead of default "down".
+
+`Marker`, `InfoBox` and `Label` pass any other properties down to the actual `div` that they render, so it's possible to assign event listeners to them.
 
 ## Controlling the map state
 

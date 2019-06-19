@@ -101,7 +101,13 @@ class Taxi extends React.Component {
         <Clusters objects={orders} render={renderOrdersCluster} />
         <Clusters objects={drivers} render={renderDriverCluster} />
 
-        {showLabel && <Label text="You are here" coords={user.coords} />}
+        {showLabel && (
+          <Label
+            text="You are here"
+            coords={user.coords}
+            onClick={() => alert("You are here")}
+          />
+        )}
         <Marker coords={user.coords} onClick={this.toggleLabel} />
       </SlippyMap>
     );
