@@ -12,21 +12,18 @@ const zoomStyle = {
 };
 
 function ZoomControl(props) {
+  const { value, min, max, step, onChange } = props;
+
+  const less = () => onChange(value - step);
+  const more = () => onChange(value + step);
+
   return (
     <div style={zoomStyle}>
-      ({props.current})
-      <button
-        type="button"
-        onClick={props.less}
-        disabled={props.current <= props.min}
-      >
+      ({value})
+      <button type="button" onClick={less} disabled={value <= min}>
         &minus;
       </button>
-      <button
-        type="button"
-        onClick={props.more}
-        disabled={props.current >= props.max}
-      >
+      <button type="button" onClick={more} disabled={value >= max}>
         +
       </button>
     </div>
@@ -40,29 +37,16 @@ export default function withOwnZoom(M) {
       this.state = {
         zoom: props.defaultZoom
       };
-      this.zoomOut = this.zoomOut.bind(this);
-      this.zoomIn = this.zoomIn.bind(this);
+      this.handleChange = this.handleChange.bind(this);
       this.onWheel = this.onWheel.bind(this);
     }
 
-    zoomOut() {
-      this.setState(function(s) {
-        let zoom = Math.round((s.zoom - this.props.zoomStep) * 100) / 100;
-        if (zoom < this.props.minZoom) {
-          zoom = this.props.minZoom;
-        }
-        return { zoom };
-      });
-    }
+    handleChange(val) {
+      const { minZoom, maxZoom } = this.props;
 
-    zoomIn() {
-      this.setState(function(s) {
-        let zoom = Math.round((s.zoom + this.props.zoomStep) * 100) / 100;
-        if (zoom > this.props.maxZoom) {
-          zoom = this.props.maxZoom;
-        }
-        return { zoom };
-      });
+      const fixRounding = num => Math.round(num * 100) / 100;
+      const zoom = Math.min(maxZoom, Math.max(minZoom, fixRounding(val)));
+      this.setState({ zoom });
     }
 
     onWheel(event) {
@@ -70,11 +54,15 @@ export default function withOwnZoom(M) {
       if (this.ignoreWheelUntil && event.timeStamp < this.ignoreWheelUntil) {
         return;
       }
+
+      const { zoomStep } = this.props;
+      const { zoom } = this.state;
+
       let delay = 33 + this.props.zoomStep * 166;
       if (delay > 200) delay = 200;
       this.ignoreWheelUntil = event.timeStamp + delay;
 
-      event.deltaY > 0 ? this.zoomOut() : this.zoomIn();
+      this.handleChange(event.deltaY > 0 ? zoom - zoomStep : zoom + zoomStep);
     }
 
     render() {
@@ -82,11 +70,11 @@ export default function withOwnZoom(M) {
         <div style={containerStyle}>
           <M zoom={this.state.zoom} onWheel={this.onWheel} {...this.props} />
           <ZoomControl
-            less={this.zoomOut}
-            more={this.zoomIn}
+            onChange={this.handleChange}
             min={this.props.minZoom}
             max={this.props.maxZoom}
-            current={this.state.zoom}
+            value={this.state.zoom}
+            step={this.props.zoomStep}
           />
         </div>
       );
