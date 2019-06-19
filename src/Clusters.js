@@ -2,6 +2,7 @@ import React from "react";
 import Projection from "./mercator";
 import Pin from "./Pin";
 import Marker from "./canned/Marker";
+import { Context } from "./Context";
 
 function defaultRender(cluster) {
   if (cluster.objects.length == 1) {
@@ -10,11 +11,7 @@ function defaultRender(cluster) {
   return <Marker color="red" />;
 }
 
-// A clustering container for map objects. Reorganizes its
-// children merging those of them that are close to each other
-// into generic cluster markers. Children that didn't get
-// into any cluster are rendered without changes.
-export default class Clusters extends React.PureComponent {
+class PureClusters extends React.PureComponent {
   render() {
     let { offset, zoom, threshold, objects } = this.props;
     let dist = pixelDistance.bind(undefined, zoom);
@@ -45,11 +42,21 @@ export default class Clusters extends React.PureComponent {
           {renderedCluster}
         </Pin>
       );
-      //return withProps(renderedCluster, {zoom, offset}, i);
     });
 
     return <div>{markers}</div>;
   }
+}
+
+// A clustering container.
+// Reduces an array of objects to an array of clusters and renders
+// the clusters as markers.
+export default function Clusters(props) {
+  return (
+    <Context.Consumer>
+      {({ zoom }) => <PureClusters zoom={zoom} {...props} />}
+    </Context.Consumer>
+  );
 }
 
 Clusters.defaultProps = {
