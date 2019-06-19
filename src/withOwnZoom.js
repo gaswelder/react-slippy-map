@@ -14,18 +14,21 @@ const zoomStyle = {
 function ZoomControl(props) {
   const { value, min, max, step, onChange } = props;
 
-  const less = () => onChange(value - step);
-  const more = () => onChange(value + step);
+  const handleChange = e => {
+    onChange(e.target.value);
+  };
 
   return (
     <div style={zoomStyle}>
       ({value})
-      <button type="button" onClick={less} disabled={value <= min}>
-        &minus;
-      </button>
-      <button type="button" onClick={more} disabled={value >= max}>
-        +
-      </button>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={handleChange}
+      />
     </div>
   );
 }
