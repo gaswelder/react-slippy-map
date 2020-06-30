@@ -1,3 +1,4 @@
 export default {
-  internalFault: console.error
+  internalFault: console.error,
+  propsFault: console.warn,
 };

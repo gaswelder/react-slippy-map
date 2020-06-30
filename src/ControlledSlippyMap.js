@@ -3,6 +3,7 @@ import Projection from "./mercator";
 import DraggableDiv from "./DraggableDiv";
 import TilesLayer from "./TilesLayer";
 import { Context } from "./Context";
+import report from "./report";
 
 export default class ControlledSlippyMap extends React.Component {
   constructor(props) {
@@ -154,7 +155,7 @@ export default class ControlledSlippyMap extends React.Component {
   renderLayer() {
     const { baseTilesUrl } = this.props;
     if (!baseTilesUrl) {
-      console.warn("missing baseTilesUrl prop for slippy map");
+      report.propsFault("missing baseTilesUrl prop for slippy map");
     }
     let zoom = this.props.zoom;
     let lat = this.props.center.latitude;
