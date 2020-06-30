@@ -145,13 +145,17 @@ export default class ControlledSlippyMap extends React.Component {
     // the user happens to be at round coordinates).
     const offset = {
       x: Math.round(Projection.getX(center.longitude, zoom) / 10000) * 10000,
-      y: Math.round(Projection.getY(center.latitude, zoom) / 10000) * 10000
+      y: Math.round(Projection.getY(center.latitude, zoom) / 10000) * 10000,
     };
 
     return offset;
   }
 
   renderLayer() {
+    const { baseTilesUrl } = this.props;
+    if (!baseTilesUrl) {
+      console.warn("missing baseTilesUrl prop for slippy map");
+    }
     let zoom = this.props.zoom;
     let lat = this.props.center.latitude;
     let lon = this.props.center.longitude;
