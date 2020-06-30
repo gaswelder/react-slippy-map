@@ -10,7 +10,7 @@ export default class ControlledSlippyMap extends React.Component {
 
     this.state = {
       // Current size of the map's container element.
-      containerSize: [0, 0]
+      containerSize: [0, 0],
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -26,7 +26,7 @@ export default class ControlledSlippyMap extends React.Component {
     // we need since the first render returned nothing because
     // the container was still missing.
     this.setState({
-      containerSize: [c.offsetWidth, c.offsetHeight]
+      containerSize: [c.offsetWidth, c.offsetHeight],
     });
   }
 
@@ -48,7 +48,7 @@ export default class ControlledSlippyMap extends React.Component {
     // corresponding latitude and longitude.
     return {
       latitude: Projection.getLat(my + y, zoom),
-      longitude: Projection.getLon(mx + x, zoom)
+      longitude: Projection.getLon(mx + x, zoom),
     };
   }
 
@@ -109,12 +109,12 @@ export default class ControlledSlippyMap extends React.Component {
       minHeight: "1em",
       height: "100%",
       position: "relative",
-      overflow: "hidden"
+      overflow: "hidden",
     };
 
     return (
       <Context.Provider value={{ zoom, offset }}>
-        <div style={style} ref={ref => (this._container = ref)}>
+        <div style={style} ref={(ref) => (this._container = ref)}>
           {this._container && this.renderLayer()}
         </div>
       </Context.Provider>
@@ -127,7 +127,7 @@ export default class ControlledSlippyMap extends React.Component {
     let [w, h] = this.halfSize();
     return {
       leftTop: this.coordinatesAtOffset(-w, -h),
-      rightBottom: this.coordinatesAtOffset(w, h)
+      rightBottom: this.coordinatesAtOffset(w, h),
     };
   }
 
@@ -170,7 +170,7 @@ export default class ControlledSlippyMap extends React.Component {
     let layerStyle = {
       position: "absolute",
       left: `${left}px`,
-      top: `${top}px`
+      top: `${top}px`,
     };
 
     return (
@@ -181,7 +181,7 @@ export default class ControlledSlippyMap extends React.Component {
         onWheel={this.props.onWheel}
       >
         <TilesLayer
-          baseUrl={this.props.baseTilesUrl}
+          baseUrl={baseTilesUrl}
           zoom={this.props.zoom}
           area={this.area()}
           offset={offset}
@@ -199,5 +199,5 @@ ControlledSlippyMap.defaultProps = {
   center: { latitude: 53.9049, longitude: 27.5609 },
   onCenterChange: noop,
   onClick: noop,
-  onWheel: noop
+  onWheel: noop,
 };
