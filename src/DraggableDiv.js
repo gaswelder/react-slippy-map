@@ -6,10 +6,10 @@ export default class DraggableDiv extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
+    this._state = {
       prevMousePos: [0, 0],
       mouseDown: false,
-      dragStarted: false
+      dragStarted: false,
     };
 
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -31,19 +31,19 @@ export default class DraggableDiv extends React.Component {
   }
 
   onMouseDown(event) {
-    this.setState({
+    this._state = {
       mouseDown: true,
       dragStarted: false,
-      prevMousePos: [event.pageX, event.pageY]
-    });
+      prevMousePos: [event.pageX, event.pageY],
+    };
   }
 
   onMouseUp() {
-    this.setState({ mouseDown: false });
+    this._state.mouseDown = false;
   }
 
   onMouseMove(event) {
-    let s = this.state;
+    const s = this._state;
 
     if (!s.mouseDown) {
       return;
@@ -62,22 +62,20 @@ export default class DraggableDiv extends React.Component {
     // and update our pixel tracking.
     if (s.dragStarted) {
       this.props.onMove({ dx, dy });
-      this.setState({
-        prevMousePos: [x, y]
-      });
+      this._state.prevMousePos = [x, y];
     }
     // If the "gesture" is not yet qualified as dragging,
     // see if it already qualifies by looking if the mouse
     // has travalled far enough.
     else {
       if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
-        this.setState({ dragStarted: true });
+        this._state.dragStarted = true;
       }
     }
   }
 
   onClick(event) {
-    if (this.state.dragStarted) {
+    if (this._state.dragStarted) {
       return;
     }
     this.props.onClick(event);
@@ -90,7 +88,7 @@ export default class DraggableDiv extends React.Component {
 
     return (
       <div
-        ref={d => {
+        ref={(d) => {
           this.element = d;
         }}
         onMouseDown={this.onMouseDown}
@@ -98,7 +96,7 @@ export default class DraggableDiv extends React.Component {
         onMouseMove={this.onMouseMove}
         onMouseLeave={this.onMouseUp}
         onClick={this.onClick}
-        onDragStart={e => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
         {...otherProps}
       >
         {this.props.children}
