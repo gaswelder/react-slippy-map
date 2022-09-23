@@ -4,7 +4,8 @@ From-scratch implementation of a "web mercator"-projected slippy map. This is
 not a wrapper around an existing old-style map widget, but a real React
 component.
 
-A demo (for desktop Firefox and Chrome): https://gaswelder.github.io/react-slippy-map/demo/
+A demo (for desktop Firefox and Chrome):
+https://gaswelder.github.io/react-slippy-map/demo/
 
 ## Usage example
 
@@ -28,30 +29,33 @@ function MyComponent() {
 }
 ```
 
-## `SlippyMap`
+## `SlippyMap` - the main component
 
-`SlippyMap` is the main component that actually draws the map with tiles.
+It has width and height assigned to 100%, thus its size is controlled by the
+size of its container.
 
-The map component has width and height assigned to 100%, thus its size is
-controlled by the size of its container.
+Props:
 
-The properties are:
-
-- required `baseTilesUrl`
-- `center: { latitude:number, longitude:number }`
-- `onCenterChange` - called with `{latitude, longitude}` every time the user drags the map
+- required `baseTilesUrl` - for example,
+  "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+- `center`: `{ latitude:number, longitude:number }` - coordinates of the map
+  center
+- `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider;
+  can be fractional (in that case the closest zoom's tiles are scaled to
+  interpolate)
 - `children` - content like markers and boxes
-- `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider; can be fractional (in that case the closest zoom's tiles are scaled)
-- `onClick` - function that is called on click events on the map; receives a `{latitude, longitude}` object as the argument
-- `onWheel` - called with the wheel event as the argument when the user uses the mouse wheel
+- `onCenterChange` - called with `{latitude, longitude}` every time the user
+  drags the map
+- `onClick` - function that is called on click events on the map; receives a
+  `{latitude, longitude}` object as the argument
+- `onWheel` - called with the wheel event as the argument when the user uses the
+  mouse wheel
 
 If `center` is not set, the map starts at `defaultCenter` and takes care of controlling this prop itself.
 If `zoom` is not set, the map starts at `defaultZoom`, renders additionally zoom in/out buttons and controls the zoom itself.
 Additionally, `minZoom`, `maxZoom` and `zoomStep` props are taken into account by the zoom buttons.
 
-## `Pin`
-
-`Pin` is a generic container for any content that can be put on the map.
+## `Pin` - generic positioned container for any content
 
 ```js
 import { SlippyMap, Pin } from "react-slippy-map";
@@ -82,7 +86,7 @@ const userMarkerStyle = {
   // the reference point we shift it halfway left and top.
   position: "relative",
   left: "-16px",
-  top: "-16px"
+  top: "-16px",
 };
 function UserMarker(props) {
   return (
@@ -105,12 +109,12 @@ function MapWithUser(props) {
 }
 ```
 
-## `Path`
+## `Path` - renders as a polyline on the map
 
-`Path` renders as a polyline on the map.
+Props:
 
 - required `points` - array of `{latitude, longitude}` objects
-- `color = "orange"` - color of the line
+- `color`: `string` - color of the line
 
 ## Canned components
 
@@ -138,7 +142,7 @@ class MyMap extends React.Component {
     super(props);
     this.state = {
       center: { latitude: 53.9049, longitude: 27.5609 },
-      zoom: 10
+      zoom: 10,
     };
     this.onCenterChange = this.onCenterChange.bind(this);
     this.onWheel = this.onWheel.bind(this);
@@ -149,7 +153,7 @@ class MyMap extends React.Component {
   }
 
   onWheel(event) {
-    this.setState(function(state) {
+    this.setState(function (state) {
       let delta = event.deltaY > 0 ? -1 : 1;
       return { zoom: state.zoom + delta };
     });
@@ -170,69 +174,45 @@ class MyMap extends React.Component {
 }
 ```
 
-## Clusters
+## Clusters - groups objects into one and renders the groups
 
-It's possible to wrap multiple objects in a `Cluster` component and have them
-clustered:
+Props:
+
+- required `objects`: `{coords: {...}, ...}[]`
+- `threshold`: `number` - pixel distance at which objects are merged into a
+  cluster
+- `render`: `({objects: {coords: {...}}[]}) => JSX` - function to render the
+  clusters with. Receives a cluster object with the field `objects` having a
+  subset of the original objects.
 
 ```js
-import { SlippyMap as Map, Clusters } from "react-slippy-map";
+import { SlippyMap, Clusters } from "react-slippy-map";
 
-function View(props) {
+function ClustersExample(props) {
+  let zerlings = [
+    {
+      coords: { latitude: 12.3, longitude: 58.2042 },
+      data: { health: 50 },
+    },
+    {
+      data: { health: 48 },
+      coords: { latitude: 12.3001, longitude: 58.2044 },
+    },
+  ];
   return (
-    <Map>
-      <Clusters objects={props.zerlings} />
+    <SlippyMap>
+      <Clusters objects={zerlings} render={renderZerlingsCluster} />
       <Clusters objects={props.marines} />
-    </Map>
+    </SlippyMap>
   );
-}
-```
-
-The `Cluster` component's `objects` property must be an array with objects,
-each having a `coords` field with latitude and longitude. For example:
-
-```js
-let zerlings = [
-  {
-    type: "zerling",
-    health: 50,
-    coords: { latitude: 12.3, longitude: 58.2042 }
-  },
-  {
-    type: "zerling",
-    health: 48,
-    coords: { latitude: 12.3001, longitude: 58.2044 }
-  }
-];
-```
-
-The pixel distance at which objects are merged into a cluster is set in the
-`threshold` property:
-
-    <Clusters threshold={20} objects={zerlings}/>
-
-By default after the calculation of resulting cluster centers the clusters
-component renders standard markers at those points. The rendering can be
-controlled by a callback passed as `render` property.
-
-The callback will receive a cluster object with the field `objects` having a
-subset of the original objects property and will have to return a JSX element:
-
-```js
-function View(props) {
-  return <Clusters objects={props.zerlings} render={renderZerlingsCluster} />;
 }
 
 function renderZerlingsCluster(cluster) {
-  let n = cluster.objects.count;
-
-  // If this cluster has only one zerling, render it as usual.
+  let n = cluster.objects.length;
   if (n == 1) {
     let zerlingObject = cluster.objects[0];
     return <Zerling {...zerlingObject} />;
   }
-
-  // If there are multiple zerlings, render some meta info.
   let label = "";
   if (n > 50) {
     label = "You're gone, pal";
