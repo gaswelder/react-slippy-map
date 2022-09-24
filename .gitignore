@@ -2,3 +2,4 @@ node_modules
 app.bin.js
 yarn.lock
 /index.js
+.vscode
