@@ -96,6 +96,19 @@ function projectionCoords(point, zoom) {
 // Takes an array of objects and returns an array of clusters.
 // Each object must have a `coords` field with {latitude, longitude} values.
 function clusterizeObjects(objects, distance, threshold) {
+  if (
+    objects.some(
+      (x) =>
+        typeof x?.coords?.latitude != "number" ||
+        typeof x?.coords?.longitude != "number"
+    )
+  ) {
+    report.propsFault(
+      "Cluster: missing coords.latitude or coords.longitude on objects",
+      objects
+    );
+    return [];
+  }
   // Create a array of points to give to the algorithm.
   // Keep references to the markers on the points.
   let points = objects.map(function (object) {
