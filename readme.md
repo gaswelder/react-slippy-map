@@ -72,6 +72,43 @@ function MapWithUser(props) {
 }
 ```
 
+Any component can also be placed on the map after wrapping it in the `pinned` high-order component:
+
+```js
+import { SlippyMap, pinned } from "react-slippy-map";
+
+// Create a custom marker
+const userMarkerStyle = {
+  width: "32px",
+  height: "32px",
+  // Pin is positioned by its left top corner, so
+  // to make our marker's center appear right above
+  // the reference point we shift it halfway left and top.
+  position: "relative",
+  left: "-16px",
+  top: "-16px",
+};
+function UserMarker(props) {
+  return (
+    <div style={userMarkerStyle} title={props.title}>
+      <img src={userMarkerImage} alt="" />
+    </div>
+  );
+}
+
+// Make a "pinned" version of the UserMarker
+const PinnedUserMarker = pinned(UserMarker);
+
+// ...And place it on the map
+function MapWithUser(props) {
+  return (
+    <SlippyMap>
+      <PinnedUserMarker coords={props.userCoords} title="You are here" />
+    </SlippyMap>
+  );
+}
+```
+
 ## `Path` - renders as a polyline on the map
 
 Props:
