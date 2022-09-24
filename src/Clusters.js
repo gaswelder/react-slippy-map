@@ -97,10 +97,12 @@ function projectionCoords(point, zoom) {
 // Each object must have a `coords` field with {latitude, longitude} values.
 function clusterizeObjects(objects, distance, threshold) {
   if (
-    objects.some(
+    !objects.every(
       (x) =>
-        typeof x?.coords?.latitude != "number" ||
-        typeof x?.coords?.longitude != "number"
+        x &&
+        x.coords &&
+        typeof x.coords.latitude == "number" &&
+        typeof x.coords.longitude == "number"
     )
   ) {
     report.propsFault(
