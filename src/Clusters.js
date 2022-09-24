@@ -27,13 +27,6 @@ export default function Clusters({
   );
 }
 
-function defaultRender(cluster) {
-  if (cluster.objects.length == 1) {
-    return <Marker />;
-  }
-  return <Marker color="red" />;
-}
-
 const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
   // Get an array of clusters.
   const clusters = clusterizeObjects(
@@ -73,6 +66,13 @@ const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
 
   return <div>{markers}</div>;
 });
+
+function defaultRender(cluster) {
+  if (cluster.objects.length == 1) {
+    return <Marker />;
+  }
+  return <Marker color="red" />;
+}
 
 // Returns distance in pixels between two
 // geopoints.
