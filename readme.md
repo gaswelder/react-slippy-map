@@ -44,10 +44,10 @@ Props:
   can be fractional (in that case the closest zoom's tiles are scaled to
   interpolate)
 - `children` - content like markers and boxes
-- `onCenterChange` - called with `{latitude, longitude}` every time the user
-  drags the map
 - `onClick` - function that is called on click events on the map; receives a
   `{latitude, longitude}` object as the argument
+- `onAreaChange` - called with `{center: Coords, leftTop: Coords, rightBottom: Coords}` every time the user
+  the area is changed
 - `onWheel` - called with the wheel event as the argument when the user uses the
   mouse wheel
 
@@ -137,41 +137,29 @@ An example of controlling the map:
 import React from "react";
 import { SlippyMap } from "react-slippy-map";
 
-class MyMap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      center: { latitude: 53.9049, longitude: 27.5609 },
-      zoom: 10,
-    };
-    this.onCenterChange = this.onCenterChange.bind(this);
-    this.onWheel = this.onWheel.bind(this);
-  }
+const MyMap = () => {
+  const [center, setCenter] = useState({
+    latitude: 53.9049,
+    longitude: 27.5609,
+  });
+  const [zoom, setZoom] = useState(10);
 
-  onCenterChange(center) {
-    this.setState({ center });
-  }
-
-  onWheel(event) {
-    this.setState(function (state) {
-      let delta = event.deltaY > 0 ? -1 : 1;
-      return { zoom: state.zoom + delta };
-    });
-  }
-
-  render() {
-    return (
-      <div style={{ height: "500px" }}>
-        <SlippyMap
-          center={this.state.center}
-          onCenterChange={this.onCenterChange}
-          zoom={this.state.zoom}
-          onWheel={this.onWheel}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div style={{ height: "500px" }}>
+      <SlippyMap
+        center={center}
+        zoom={zoom}
+        onAreaChange={(area) => {
+          setCenter(area.center);
+        }}
+        onWheel={(event) => {
+          const delta = event.deltaY > 0 ? -1 : 1;
+          setZoom((x) => x + delta);
+        }}
+      />
+    </div>
+  );
+};
 ```
 
 ## Clusters - groups objects into one and renders the groups

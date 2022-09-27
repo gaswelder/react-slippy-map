@@ -45,15 +45,15 @@ export const ControlledSlippyMap = (props) => {
 };
 
 const Layer = ({
+  containerSize,
+  containerElement,
   baseTilesUrl,
   zoom,
   center,
+  onAreaChange,
   onWheel,
   onClick,
   children,
-  containerSize,
-  onCenterChange,
-  containerElement,
 }) => {
   if (!baseTilesUrl) {
     report.propsFault("missing baseTilesUrl prop for slippy map");
@@ -101,19 +101,23 @@ const Layer = ({
   // Preprocesses dragging events and calls the listener in the props.
   const $handleMove = useCallback(
     (event) => {
-      if (!onCenterChange) {
+      if (!onAreaChange) {
         return;
       }
-      const newCenterCoords = coordinatesAtOffset(
-        center,
-        zoom,
-        -event.dx,
-        -event.dy
-      );
-      onCenterChange(newCenterCoords);
+      onAreaChange({
+        center: coordinatesAtOffset(center, zoom, -event.dx, -event.dy),
+        ...$area,
+      });
     },
-    [onCenterChange, center, zoom]
+    [onAreaChange, center, zoom, $area]
   );
+
+  useEffect(() => {
+    if (!onAreaChange) {
+      return;
+    }
+    onAreaChange({ center, ...$area });
+  }, [onAreaChange, center, $area]);
 
   const $layerStyle = useMemo(() => {
     return {

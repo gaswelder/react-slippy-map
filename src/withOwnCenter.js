@@ -6,16 +6,16 @@ export default function withOwnCenter(M) {
   return (props) => {
     const [center, setCenter] = useState(defaultCenter);
 
-    const onCenterChange = props.onCenterChange;
+    const onAreaChange = props.onAreaChange;
     const handleCenterChange = useCallback(
-      (center) => {
-        setCenter(center);
-        if (onCenterChange) {
-          onCenterChange(center);
+      (area) => {
+        setCenter(area.center);
+        if (onAreaChange) {
+          onAreaChange(area);
         }
       },
-      [onCenterChange]
+      [onAreaChange]
     );
-    return <M {...props} onCenterChange={handleCenterChange} center={center} />;
+    return <M {...props} onAreaChange={handleCenterChange} center={center} />;
   };
 }
