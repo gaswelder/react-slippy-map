@@ -1,5 +1,5 @@
 import React from "react";
-import ControlledSlippyMap from "./ControlledSlippyMap";
+import { ControlledSlippyMap } from "./ControlledSlippyMap";
 import withOwnCenter from "./withOwnCenter";
 import withOwnZoom from "./withOwnZoom";
 
