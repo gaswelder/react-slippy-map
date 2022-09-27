@@ -1,32 +1,21 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 
 const defaultCenter = { latitude: 53.9049, longitude: 27.5609 };
 
 export default function withOwnCenter(M) {
-  return class WithOwnCenter extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        center: props.defaultCenter || defaultCenter
-      };
-      this.handleCenterChange = this.handleCenterChange.bind(this);
-    }
+  return (props) => {
+    const [center, setCenter] = useState(defaultCenter);
 
-    handleCenterChange(center) {
-      this.setState({ center });
-      if (this.props.onCenterChange) {
-        this.props.onCenterChange(center);
-      }
-    }
-
-    render() {
-      return (
-        <M
-          onCenterChange={this.handleCenterChange}
-          center={this.state.center}
-          {...this.props}
-        />
-      );
-    }
+    const onCenterChange = props.onCenterChange;
+    const handleCenterChange = useCallback(
+      (center) => {
+        setCenter(center);
+        if (onCenterChange) {
+          onCenterChange(center);
+        }
+      },
+      [onCenterChange]
+    );
+    return <M {...props} onCenterChange={handleCenterChange} center={center} />;
   };
 }
