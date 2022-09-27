@@ -24,7 +24,7 @@ export default function Pin(props) {
         let style = {
           position: "absolute",
           left: px + "px",
-          top: py + "px"
+          top: py + "px",
         };
 
         return (

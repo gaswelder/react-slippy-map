@@ -9,7 +9,7 @@ const drivers = [
   { id: "2602", coords: { latitude: 53.85691, longitude: 27.516632 } },
   { id: "2605", coords: { latitude: 53.904469, longitude: 27.504182 } },
   { id: "2603", coords: { latitude: 53.869937, longitude: 27.497484 } },
-  { id: "2604", coords: { latitude: 53.927968, longitude: 27.525654 } }
+  { id: "2604", coords: { latitude: 53.927968, longitude: 27.525654 } },
 ];
 
 const orders = [
@@ -34,8 +34,8 @@ const orders = [
   { coords: { latitude: 53.90279618479734, longitude: 27.56475873073345 } },
   { coords: { latitude: 53.905981777806005, longitude: 27.562723790027288 } },
   { coords: { latitude: 53.90874530194332, longitude: 27.56430789243165 } },
-  { coords: { latitude: 53.902753914290386, longitude: 27.56497244853907 } }
-].map(function(o) {
+  { coords: { latitude: 53.902753914290386, longitude: 27.56497244853907 } },
+].map(function (o) {
   o.latitude += (Math.random() - 0.5) * 0.1;
   o.longitude += (Math.random() - 0.5) * 0.1;
   return o;
@@ -44,7 +44,7 @@ const orders = [
 const driverStyle = {
   background: "rgba(255, 255, 255, 0.8)",
   padding: "1em",
-  boxShadow: "1px 1px 2px #666"
+  boxShadow: "1px 1px 2px #666",
 };
 
 const orderStyle = {
@@ -57,7 +57,7 @@ const orderStyle = {
   textAlign: "center",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
 };
 
 function renderDriverCluster(cluster) {
@@ -79,13 +79,13 @@ class Taxi extends React.Component {
   constructor() {
     super();
     this.state = {
-      showLabel: true
+      showLabel: true,
     };
     this.toggleLabel = this.toggleLabel.bind(this);
   }
 
   toggleLabel() {
-    this.setState(ps => ({ showLabel: !ps.showLabel }));
+    this.setState((ps) => ({ showLabel: !ps.showLabel }));
   }
 
   render() {
@@ -94,7 +94,7 @@ class Taxi extends React.Component {
     return (
       <SlippyMap
         defaultCenter={user.coords}
-        defaultZoom={18}
+        defaultZoom={14}
         zoomStep={0.1}
         baseTilesUrl="https://b.tile.openstreetmap.org"
       >
