@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo, memo } from "react";
 import Projection from "./mercator";
 
 // Length of a map tile's side in pixels
 const TileSize = 256;
 
-export const TilesLayer = ({ area, zoom, offset, baseUrl }) => {
+export const TilesLayer = memo(({ area, zoom, offset, baseUrl }) => {
   const x1 = Projection.getX(area.leftTop.longitude, zoom);
   const x2 = Projection.getX(area.rightBottom.longitude, zoom);
   const y1 = Projection.getY(area.leftTop.latitude, zoom);
@@ -29,34 +29,42 @@ export const TilesLayer = ({ area, zoom, offset, baseUrl }) => {
   const j1 = Math.floor(y1 / size);
   const j2 = Math.floor(y2 / size);
 
-  // The parent component puts the rendered result in a coordinate system
-  // shifted to keep the relative coordinates of the tiles low. The offset is
-  // given as a property here.
-
-  const tiles = [];
-  for (let i = i1; i <= i2; i++) {
-    for (let j = j1; j <= j2; j++) {
-      const key = `${izoom}/${i}/${j}`;
-      const url = `${baseUrl}/${key}.png`;
-      const style = {
-        position: "absolute",
-        left: i * size - offset.x + "px",
-        top: j * size - offset.y + "px",
-        width: size + "px",
-        height: size + "px",
-        backgroundColor: "#e6ec88",
-      };
-      tiles.push(
-        <div key={key} style={style}>
-          <img src={url} style={{ width: "100%" }} alt="" />
-        </div>
-      );
+  const $tiles = useMemo(() => {
+    const tiles = [];
+    for (let i = i1; i <= i2; i++) {
+      for (let j = j1; j <= j2; j++) {
+        const key = `${izoom}/${i}/${j}`;
+        tiles.push(
+          <div
+            key={key}
+            style={{
+              position: "absolute",
+              // The parent component puts the rendered result in a coordinate system
+              // shifted to keep the relative coordinates of the tiles low. That offset is
+              // given as a prop here.
+              left: i * size - offset.x + "px",
+              top: j * size - offset.y + "px",
+              width: size + "px",
+              height: size + "px",
+              backgroundColor: "#e6ec88",
+            }}
+          >
+            <img
+              src={`${baseUrl}/${key}.png`}
+              style={{ width: "100%" }}
+              alt=""
+            />
+          </div>
+        );
+      }
     }
-  }
+    return tiles;
+  }, [i1, i2, j1, j2, izoom, baseUrl, size]);
+
   const style = { position: "relative" };
   return (
     <div className="tiles-container" style={style}>
-      {tiles}
+      {$tiles}
     </div>
   );
-};
+});
