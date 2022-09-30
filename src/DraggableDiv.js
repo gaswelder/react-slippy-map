@@ -1,106 +1,94 @@
-import React from "react";
+import React, { useEffect, useRef, useCallback } from "react";
+
+const prevent = (e) => e.preventDefault();
 
 // A div that tracks its own dragging and calls its onMove
 // callback with preprocessed drag events.
-export default class DraggableDiv extends React.Component {
-  constructor(props) {
-    super(props);
+export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
+  const elementRef = useRef();
+  const _state = useRef({
+    prevMousePos: [0, 0],
+    mouseDown: false,
+    dragStarted: false,
+  }).current;
 
-    this._state = {
-      prevMousePos: [0, 0],
-      mouseDown: false,
-      dragStarted: false,
+  useEffect(() => {
+    if (!elementRef.current) {
+      return;
+    }
+    elementRef.current.addEventListener("selectstart", prevent);
+    return () => {
+      elementRef.current.removeEventListener("selectstart", prevent);
     };
+  }, [elementRef.current]);
 
-    this.onMouseDown = this.onMouseDown.bind(this);
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
-    this.onClick = this.onClick.bind(this);
-  }
-
-  preventSelection(e) {
-    e.preventDefault();
-  }
-
-  componentDidMount() {
-    this.element.addEventListener("selectstart", this.preventSelection);
-  }
-
-  componentWillUnmount() {
-    this.element.removeEventListener("selectstart", this.preventSelection);
-  }
-
-  onMouseDown(event) {
-    this._state = {
+  const $onMouseDown = useCallback((event) => {
+    Object.assign(_state, {
       mouseDown: true,
       dragStarted: false,
       prevMousePos: [event.pageX, event.pageY],
-    };
-  }
+    });
+  }, []);
 
-  onMouseUp() {
-    this._state.mouseDown = false;
-  }
+  const $onMouseUp = useCallback(() => {
+    _state.mouseDown = false;
+  }, []);
 
-  onMouseMove(event) {
-    const s = this._state;
-
-    if (!s.mouseDown) {
-      return;
-    }
-
-    let x = event.pageX;
-    let y = event.pageY;
-    let dx = x - s.prevMousePos[0];
-    let dy = y - s.prevMousePos[1];
-
-    // Mousemove can occur during a legitimate click too.
-    // To account for that we let some limited mousemove
-    // before considering the gesture as a dragging.
-
-    // If this is a dragging, call the onMove handler
-    // and update our pixel tracking.
-    if (s.dragStarted) {
-      this.props.onMove({ dx, dy });
-      this._state.prevMousePos = [x, y];
-    }
-    // If the "gesture" is not yet qualified as dragging,
-    // see if it already qualifies by looking if the mouse
-    // has travalled far enough.
-    else {
-      if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
-        this._state.dragStarted = true;
+  const $onMouseMove = useCallback(
+    (event) => {
+      const s = _state;
+      if (!s.mouseDown) {
+        return;
       }
-    }
-  }
+      let x = event.pageX;
+      let y = event.pageY;
+      let dx = x - s.prevMousePos[0];
+      let dy = y - s.prevMousePos[1];
 
-  onClick(event) {
-    if (this._state.dragStarted) {
-      return;
-    }
-    this.props.onClick(event);
-  }
+      // Mousemove can occur during a legitimate click too.
+      // To account for that we let some limited mousemove
+      // before considering the gesture as a dragging.
 
-  render() {
-    let otherProps = Object.assign({}, this.props);
-    delete otherProps.onClick;
-    delete otherProps.onMove;
+      // If this is a dragging, call the onMove handler
+      // and update our pixel tracking.
+      if (s.dragStarted) {
+        onMove({ dx, dy });
+        _state.prevMousePos = [x, y];
+      }
+      // If the "gesture" is not yet qualified as dragging,
+      // see if it already qualifies by looking if the mouse
+      // has travalled far enough.
+      else {
+        if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
+          _state.dragStarted = true;
+        }
+      }
+    },
+    [onMove]
+  );
 
-    return (
-      <div
-        ref={(d) => {
-          this.element = d;
-        }}
-        onMouseDown={this.onMouseDown}
-        onMouseUp={this.onMouseUp}
-        onMouseMove={this.onMouseMove}
-        onMouseLeave={this.onMouseUp}
-        onClick={this.onClick}
-        onDragStart={(e) => e.preventDefault()}
-        {...otherProps}
-      >
-        {this.props.children}
-      </div>
-    );
-  }
-}
+  const $onClick = useCallback(
+    (event) => {
+      if (_state.dragStarted) {
+        return;
+      }
+      onClick(event);
+    },
+    [onClick]
+  );
+
+  return (
+    <div
+      ref={elementRef}
+      onMouseDown={$onMouseDown}
+      onMouseUp={$onMouseUp}
+      onMouseMove={$onMouseMove}
+      onMouseLeave={$onMouseUp}
+      onClick={$onClick}
+      onDragStart={prevent}
+      {...otherProps}
+    >
+      {children}
+    </div>
+  );
+};

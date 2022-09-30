@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Context } from "./Context";
-import DraggableDiv from "./DraggableDiv";
+import { DraggableDiv } from "./DraggableDiv";
 import Projection from "./mercator";
 import report from "./report";
 import { TilesLayer } from "./TilesLayer";
