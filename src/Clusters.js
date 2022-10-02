@@ -1,4 +1,4 @@
-import React, { memo, useRef } from "react";
+import React, { memo, useRef, useContext } from "react";
 import Projection from "./mercator";
 import Pin from "./Pin";
 import Marker from "./canned/Marker";
@@ -19,13 +19,8 @@ export default function Clusters({
   render = defaultRender,
 }) {
   const o = useStabilizer(objects);
-  return (
-    <Context.Consumer>
-      {({ zoom }) => (
-        <PureClusters zoom={zoom} {...{ threshold, objects: o, render }} />
-      )}
-    </Context.Consumer>
-  );
+  const { zoom } = useContext(Context);
+  return <PureClusters zoom={zoom} {...{ threshold, objects: o, render }} />;
 }
 
 const useStabilizer = (xs) => {
