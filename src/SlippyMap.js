@@ -56,7 +56,7 @@ export const SlippyMap = ({
     [ignoreWheelUntil.current, zoom, zoomStep]
   );
 
-  const $handleCenterChange = useCallback(
+  const $onAreaChange = useCallback(
     (area) => {
       setCenter(area.center);
       if (onAreaChange) {
@@ -70,7 +70,7 @@ export const SlippyMap = ({
     <div style={containerStyle}>
       <ControlledSlippyMap
         {...props}
-        onAreaChange={$handleCenterChange}
+        onAreaChange={$onAreaChange}
         center={center}
         onWheel={$onWheel}
         zoom={zoom}
