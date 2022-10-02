@@ -1,50 +1,11 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Context } from "./Context";
 import { DraggableDiv } from "./DraggableDiv";
 import Projection from "./mercator";
 import report from "./report";
 import { TilesLayer } from "./TilesLayer";
 
-const rootStyle = {
-  minHeight: "1em",
-  height: "100%",
-  position: "relative",
-  overflow: "hidden",
-};
-
-export const ControlledSlippyMap = (props) => {
-  // Current size of the map's container element.
-  const [containerSize, setContainerSize] = useState([0, 0]);
-  const containerRef = useRef(null);
-  useEffect(() => {
-    const c = containerRef.current;
-    // When the map is mounted, get its container and measure its size.
-    //
-    // This will trigger a rerender, but this is exactly what we need since the
-    // first render returnes nothing because the container is still missing.
-    setContainerSize([c.offsetWidth, c.offsetHeight]);
-  }, [containerRef.current]);
-
-  return (
-    <div style={rootStyle} ref={containerRef}>
-      {containerRef.current && (
-        <Layer
-          {...props}
-          containerSize={containerSize}
-          containerElement={containerRef.current}
-        />
-      )}
-    </div>
-  );
-};
-
-const Layer = ({
+export const ControlledSlippyMap = ({
   containerSize,
   containerElement,
   baseTilesUrl,

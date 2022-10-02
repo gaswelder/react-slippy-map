@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ControlledSlippyMap } from "./ControlledSlippyMap";
 
 const containerStyle = {
@@ -10,6 +10,13 @@ const zoomStyle = {
   position: "absolute",
   right: "10px",
   bottom: "10px",
+};
+
+const rootStyle = {
+  minHeight: "1em",
+  height: "100%",
+  position: "relative",
+  overflow: "hidden",
 };
 
 const clamp = (min, max, val) => {
@@ -28,9 +35,24 @@ export const SlippyMap = ({
   onAreaChange,
   ...props
 }) => {
+  // Current size of the map's container element.
+  const [containerSize, setContainerSize] = useState([0, 0]);
+
+  // Current high-level state of the map.
   const [zoom, setZoom] = useState(defaultZoom);
   const [center, setCenter] = useState(defaultCenter);
+
   const ignoreWheelUntil = useRef(0);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const c = containerRef.current;
+    // When the map is mounted, get its container and measure its size.
+    //
+    // This will trigger a rerender, but this is exactly what we need since the
+    // first render returnes nothing because the container is still missing.
+    setContainerSize([c.offsetWidth, c.offsetHeight]);
+  }, [containerRef.current]);
 
   const $handleZoomChange = useCallback(
     (val) => {
@@ -68,13 +90,19 @@ export const SlippyMap = ({
 
   return (
     <div style={containerStyle}>
-      <ControlledSlippyMap
-        {...props}
-        onAreaChange={$onAreaChange}
-        center={center}
-        onWheel={$onWheel}
-        zoom={zoom}
-      />
+      <div style={rootStyle} ref={containerRef}>
+        {containerRef.current && (
+          <ControlledSlippyMap
+            {...props}
+            onAreaChange={$onAreaChange}
+            center={center}
+            onWheel={$onWheel}
+            zoom={zoom}
+            containerSize={containerSize}
+            containerElement={containerRef.current}
+          />
+        )}
+      </div>
       <div style={zoomStyle}>
         ({zoom})
         <input
