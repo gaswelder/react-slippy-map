@@ -1,14 +1,10 @@
-import React, { memo, useRef, useContext } from "react";
-import Projection from "./mercator";
-import Pin from "./Pin";
+import React, { memo, useContext } from "react";
 import Marker from "./canned/Marker";
 import { Context } from "./Context";
+import Projection from "./mercator";
+import Pin from "./Pin";
 import report from "./report";
-
-const warnDefault = (message, def) => {
-  report.propsFault(message);
-  return def;
-};
+import { useStabilizer, warnDefault } from "./util";
 
 // A clustering container.
 // Reduces an array of objects to an array of clusters and renders
@@ -22,38 +18,6 @@ export default function Clusters({
   const { zoom } = useContext(Context);
   return <PureClusters zoom={zoom} {...{ threshold, objects: o, render }} />;
 }
-
-const useStabilizer = (xs) => {
-  const val = useRef([]);
-  if (!deepEq(xs, val.current)) {
-    val.current = xs;
-  }
-  return val.current;
-};
-
-const deepEq = (a, b) => {
-  if (a === b) {
-    return true;
-  }
-  if (Array.isArray(a) && Array.isArray(b)) {
-    return a.length == b.length && a.every((x, i) => deepEq(x, b[i]));
-  }
-  if (typeof a == "object" && typeof b == "object") {
-    const kk = Object.keys(a);
-    return (
-      kk.length == Object.keys(b).length && kk.every((k) => deepEq(a[k], b[k]))
-    );
-  }
-  return false;
-};
-
-// const useTracker = (props) => {
-//   const prev = useRef({}).current;
-//   const changes = Object.fromEntries(
-//     Object.entries(props).filter(([k, v]) => prev[k] !== v)
-//   );
-//   Object.assign(prev, changes);
-// };
 
 const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
   // Get an array of clusters.
