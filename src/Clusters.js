@@ -67,18 +67,13 @@ const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
     pixelDistance.bind(undefined, zoom),
     threshold
   );
-
-  // Convert clusters to pinnable components
-  const markers = clusters.map(function (cluster, i) {
-    const renderedCluster = render(cluster);
+  return clusters.map((cluster, i) => {
     return (
       <Pin key={i} {...{ offset, zoom }} coords={cluster.coords}>
-        {renderedCluster}
+        {render(cluster)}
       </Pin>
     );
   });
-
-  return <div>{markers}</div>;
 });
 
 function defaultRender(cluster) {
