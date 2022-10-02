@@ -6,7 +6,7 @@ const prevent = (e) => e.preventDefault();
 // callback with preprocessed drag events.
 export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
   const elementRef = useRef();
-  const _state = useRef({
+  const state = useRef({
     prevMousePos: [0, 0],
     mouseDown: false,
     dragStarted: false,
@@ -23,7 +23,7 @@ export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
   }, [elementRef.current]);
 
   const $onMouseDown = useCallback((event) => {
-    Object.assign(_state, {
+    Object.assign(state, {
       mouseDown: true,
       dragStarted: false,
       prevMousePos: [event.pageX, event.pageY],
@@ -31,19 +31,18 @@ export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
   }, []);
 
   const $onMouseUp = useCallback(() => {
-    _state.mouseDown = false;
+    state.mouseDown = false;
   }, []);
 
   const $onMouseMove = useCallback(
     (event) => {
-      const s = _state;
-      if (!s.mouseDown) {
+      if (!state.mouseDown) {
         return;
       }
-      let x = event.pageX;
-      let y = event.pageY;
-      let dx = x - s.prevMousePos[0];
-      let dy = y - s.prevMousePos[1];
+      const x = event.pageX;
+      const y = event.pageY;
+      const dx = x - state.prevMousePos[0];
+      const dy = y - state.prevMousePos[1];
 
       // Mousemove can occur during a legitimate click too.
       // To account for that we let some limited mousemove
@@ -51,16 +50,16 @@ export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
 
       // If this is a dragging, call the onMove handler
       // and update our pixel tracking.
-      if (s.dragStarted) {
+      if (state.dragStarted) {
         onMove({ dx, dy });
-        _state.prevMousePos = [x, y];
+        state.prevMousePos = [x, y];
       }
       // If the "gesture" is not yet qualified as dragging,
       // see if it already qualifies by looking if the mouse
       // has travalled far enough.
       else {
         if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
-          _state.dragStarted = true;
+          state.dragStarted = true;
         }
       }
     },
@@ -69,7 +68,7 @@ export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
 
   const $onClick = useCallback(
     (event) => {
-      if (_state.dragStarted) {
+      if (state.dragStarted) {
         return;
       }
       onClick(event);
