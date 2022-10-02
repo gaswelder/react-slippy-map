@@ -1,6 +1,5 @@
-import React, { useMemo, useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { ControlledSlippyMap } from "./ControlledSlippyMap";
-import withOwnCenter from "./withOwnCenter";
 
 const containerStyle = {
   position: "relative",
@@ -12,6 +11,8 @@ const zoomStyle = {
   right: "10px",
   bottom: "10px",
 };
+
+const defaultCenter = { latitude: 53.9049, longitude: 27.5609 };
 
 const clamp = (min, max, val) => {
   let r = val;
@@ -25,17 +26,11 @@ export const SlippyMap = ({
   maxZoom = 20,
   zoomStep = 0.1,
   defaultZoom = 16,
+  onAreaChange,
   ...props
 }) => {
-  const M = useMemo(() => {
-    let M = ControlledSlippyMap;
-    if (props.center == undefined) {
-      M = withOwnCenter(M);
-    }
-    return M;
-  }, [props.center == undefined, props.zoom == undefined]);
-
   const [zoom, setZoom] = useState(defaultZoom);
+  const [center, setCenter] = useState(props.defaultCenter || defaultCenter);
   const ignoreWheelUntil = useRef(0);
 
   const $handleZoomChange = useCallback(
@@ -61,9 +56,26 @@ export const SlippyMap = ({
     },
     [ignoreWheelUntil.current, zoom, zoomStep]
   );
+
+  const $handleCenterChange = useCallback(
+    (area) => {
+      setCenter(area.center);
+      if (onAreaChange) {
+        onAreaChange(area);
+      }
+    },
+    [onAreaChange]
+  );
+
   return (
     <div style={containerStyle}>
-      <M zoom={zoom} onWheel={$onWheel} {...props} />
+      <ControlledSlippyMap
+        {...props}
+        onAreaChange={$handleCenterChange}
+        center={center}
+        onWheel={$onWheel}
+        zoom={zoom}
+      />
       <div style={zoomStyle}>
         ({zoom})
         <input
