@@ -12,8 +12,6 @@ const zoomStyle = {
   bottom: "10px",
 };
 
-const defaultCenter = { latitude: 53.9049, longitude: 27.5609 };
-
 const clamp = (min, max, val) => {
   let r = val;
   if (r > max) r = max;
@@ -26,11 +24,12 @@ export const SlippyMap = ({
   maxZoom = 20,
   zoomStep = 0.1,
   defaultZoom = 16,
+  defaultCenter = { latitude: 53.9049, longitude: 27.5609 },
   onAreaChange,
   ...props
 }) => {
   const [zoom, setZoom] = useState(defaultZoom);
-  const [center, setCenter] = useState(props.defaultCenter || defaultCenter);
+  const [center, setCenter] = useState(defaultCenter);
   const ignoreWheelUntil = useRef(0);
 
   const $handleZoomChange = useCallback(
