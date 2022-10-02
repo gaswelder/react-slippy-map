@@ -1,4 +1,4 @@
-import React, { memo, useContext } from "react";
+import React, { useContext } from "react";
 import Marker from "./canned/Marker";
 import { Context } from "./Context";
 import Projection from "./mercator";
@@ -15,14 +15,11 @@ export default function Clusters({
   render = defaultRender,
 }) {
   const o = useStabilizer(objects);
-  const { zoom } = useContext(Context);
-  return <PureClusters zoom={zoom} {...{ threshold, objects: o, render }} />;
-}
+  const { zoom, offset } = useContext(Context);
 
-const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
   // Get an array of clusters.
   const clusters = clusterizeObjects(
-    objects,
+    o,
     pixelDistance.bind(undefined, zoom),
     threshold
   );
@@ -33,7 +30,7 @@ const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
       </Pin>
     );
   });
-});
+}
 
 function defaultRender(cluster) {
   if (cluster.objects.length == 1) {
