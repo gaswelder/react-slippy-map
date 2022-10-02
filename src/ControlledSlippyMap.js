@@ -80,22 +80,31 @@ const Layer = ({
   const left = halfSize[0] - Projection.getX(lon, zoom) + $offset.x;
   const top = halfSize[1] - Projection.getY(lat, zoom) + $offset.y;
 
-  // Processes click events and passes the to the listener in the props.
-  const $handleClick = useCallback(
+  const $eventCoords = useCallback(
     (event) => {
-      if (!onClick) {
-        return;
-      }
-      // Find out the click event's offset from the center.
       const rect = containerElement.getBoundingClientRect();
       const x = event.pageX - rect.x;
       const y = event.pageY - rect.y;
       const dx = x - halfSize[0];
       const dy = y - halfSize[1];
-      const clickCoords = coordinatesAtOffset(center, zoom, dx, dy);
-      onClick(clickCoords);
+      return coordinatesAtOffset(center, zoom, dx, dy);
     },
-    [containerElement, halfSize[0], halfSize[1], onClick, center, zoom]
+    [containerElement, halfSize[0], halfSize[1], center, zoom]
+  );
+
+  // Processes click events and passes the to the listener in the props.
+  const $handleClick = useCallback(
+    (event) => {
+      onClick && onClick($eventCoords(event));
+    },
+    [containerElement, $eventCoords]
+  );
+
+  const $handleWheel = useCallback(
+    (event) => {
+      onWheel && onWheel({ ...event, ...$eventCoords(event) });
+    },
+    [onWheel, $eventCoords]
   );
 
   // Preprocesses dragging events and calls the listener in the props.
@@ -137,7 +146,7 @@ const Layer = ({
         style={$layerStyle}
         onClick={$handleClick}
         onMove={$handleMove}
-        onWheel={onWheel}
+        onWheel={$handleWheel}
       >
         <TilesLayer
           baseUrl={baseTilesUrl}
