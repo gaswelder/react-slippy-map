@@ -4,19 +4,14 @@ import { ControlledSlippyMap } from "./ControlledSlippyMap";
 const containerStyle = {
   position: "relative",
   height: "100%",
+  minHeight: "1em",
+  overflow: "hidden",
 };
 
 const zoomStyle = {
   position: "absolute",
   right: "10px",
   bottom: "10px",
-};
-
-const rootStyle = {
-  minHeight: "1em",
-  height: "100%",
-  position: "relative",
-  overflow: "hidden",
 };
 
 const clamp = (min, max, val) => {
@@ -89,20 +84,18 @@ export const SlippyMap = ({
   );
 
   return (
-    <div style={containerStyle}>
-      <div style={rootStyle} ref={containerRef}>
-        {containerRef.current && (
-          <ControlledSlippyMap
-            {...props}
-            onAreaChange={$onAreaChange}
-            center={center}
-            onWheel={$onWheel}
-            zoom={zoom}
-            containerSize={containerSize}
-            containerElement={containerRef.current}
-          />
-        )}
-      </div>
+    <div style={containerStyle} ref={containerRef}>
+      {containerRef.current && (
+        <ControlledSlippyMap
+          {...props}
+          onAreaChange={$onAreaChange}
+          center={center}
+          onWheel={$onWheel}
+          zoom={zoom}
+          containerSize={containerSize}
+          containerElement={containerRef.current}
+        />
+      )}
       <div style={zoomStyle}>
         ({zoom})
         <input
