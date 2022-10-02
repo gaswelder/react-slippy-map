@@ -1,23 +1,18 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ControlledSlippyMap } from "./ControlledSlippyMap";
 import withOwnCenter from "./withOwnCenter";
 import withOwnZoom from "./withOwnZoom";
 
-class SlippyMap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.M = ControlledSlippyMap;
+export const SlippyMap = (props) => {
+  const M = useMemo(() => {
+    let M = ControlledSlippyMap;
     if (props.center == undefined) {
-      this.M = withOwnCenter(this.M);
+      M = withOwnCenter(M);
     }
     if (props.zoom == undefined) {
-      this.M = withOwnZoom(this.M);
+      M = withOwnZoom(M);
     }
-  }
-  render() {
-    const { M } = this;
-    return <M {...this.props} />;
-  }
-}
-
-export default SlippyMap;
+    return M;
+  }, [props.center == undefined, props.zoom == undefined]);
+  return <M {...props} />;
+};
