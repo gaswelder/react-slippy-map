@@ -71,25 +71,6 @@ const PureClusters = memo(({ offset, zoom, threshold, objects, render }) => {
   // Convert clusters to pinnable components
   const markers = clusters.map(function (cluster, i) {
     const renderedCluster = render(cluster);
-
-    // A common mistake is to pass a pinned component as a cluster
-    // rendering. This causes an error, which we avoid by getting
-    // to the existing pin.
-    if (renderedCluster.type._isPinned) {
-      const PinnedContent = renderedCluster.type;
-      return (
-        <PinnedContent
-          key={i}
-          {...{
-            ...renderedCluster.props,
-            offset,
-            zoom,
-            coords: cluster.coords,
-          }}
-        />
-      );
-    }
-
     return (
       <Pin key={i} {...{ offset, zoom }} coords={cluster.coords}>
         {renderedCluster}

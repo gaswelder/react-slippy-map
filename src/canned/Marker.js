@@ -1,9 +1,8 @@
 import React from "react";
-import pinned from "../pinned";
+import Pin from "../Pin";
 import { boxShadow } from "./style";
 
-function Marker(props) {
-  const { color = "#0091ff", ...rest } = props;
+function Marker({ coords, color = "#0091ff", ...rest }) {
   const style = {
     background: color,
     width: "16px",
@@ -11,9 +10,13 @@ function Marker(props) {
     borderRadius: "50%",
     boxShadow,
     transform: "translate(-8px, -8px)",
-    cursor: "pointer"
+    cursor: "pointer",
   };
-  return <div style={style} {...rest} />;
+  return (
+    <Pin coords={coords}>
+      <div style={style} {...rest} />
+    </Pin>
+  );
 }
 
-export default pinned(Marker);
+export default Marker;
