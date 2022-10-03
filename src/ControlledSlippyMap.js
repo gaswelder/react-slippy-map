@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { Context } from "./Context";
-import { DraggableDiv } from "./DraggableDiv";
+import { GestureDiv } from "./GestureDiv";
 import Projection from "./mercator";
 import report from "./report";
 import { TilesLayer } from "./TilesLayer";
@@ -103,20 +103,21 @@ export const ControlledSlippyMap = ({
 
   return (
     <Context.Provider value={$contextValue}>
-      <DraggableDiv
-        style={$layerStyle}
+      <GestureDiv
         onClick={$handleClick}
         onMove={$handleMove}
         onWheel={$handleWheel}
       >
-        <TilesLayer
-          baseUrl={baseTilesUrl}
-          zoom={zoom}
-          area={$area}
-          offset={$offset}
-        />
-        <div className="objects-container">{children}</div>
-      </DraggableDiv>
+        <div style={$layerStyle}>
+          <TilesLayer
+            baseUrl={baseTilesUrl}
+            zoom={zoom}
+            area={$area}
+            offset={$offset}
+          />
+          <div className="objects-container">{children}</div>
+        </div>
+      </GestureDiv>
     </Context.Provider>
   );
 };

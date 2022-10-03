@@ -2,9 +2,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 
 const prevent = (e) => e.preventDefault();
 
-// A div that tracks its own dragging and calls its onMove
-// callback with preprocessed drag events.
-export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
+export const GestureDiv = ({ onMove, onClick, onWheel, children }) => {
   const elementRef = useRef();
   const state = useRef({
     prevMousePos: [0, 0],
@@ -85,7 +83,8 @@ export const DraggableDiv = ({ onMove, onClick, children, ...otherProps }) => {
       onMouseLeave={$onMouseUp}
       onClick={$onClick}
       onDragStart={prevent}
-      {...otherProps}
+      onWheel={onWheel}
+      style={{ outline: "thin solid red" }}
     >
       {children}
     </div>
