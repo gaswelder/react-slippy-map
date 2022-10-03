@@ -56,6 +56,19 @@ export const SlippyMap = ({
     [minZoom, maxZoom]
   );
 
+  const [zoomSpeed, setZoomSpeed] = useState(0);
+
+  useEffect(() => {
+    if (Math.abs(zoomSpeed) < 0.001) {
+      return;
+    }
+    const id = setTimeout(() => {
+      setZoomSpeed(zoomSpeed * 0.9);
+      setZoom(zoom + zoomSpeed * 10);
+    }, 10);
+    return () => clearTimeout(id);
+  }, [zoomSpeed, zoom]);
+
   const $onWheel = useCallback(
     (event) => {
       // Throttle barrier
@@ -68,7 +81,13 @@ export const SlippyMap = ({
       let delay = 33 + zoomStep * 166;
       if (delay > 200) delay = 200;
       ignoreWheelUntil.current = event.timeStamp + delay;
-      $handleZoomChange(event.deltaY > 0 ? zoom - zoomStep : zoom + zoomStep);
+
+      if (event.deltaY == 0) {
+        return;
+      }
+
+      setZoomSpeed(event.deltaY > 0 ? zoomStep / 20 : -zoomStep / 20);
+      // $handleZoomChange(event.deltaY > 0 ? zoom - zoomStep : zoom + zoomStep);
     },
     [ignoreWheelUntil.current, zoom, zoomStep]
   );
