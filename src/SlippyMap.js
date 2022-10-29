@@ -28,13 +28,18 @@ export const SlippyMap = ({
   defaultZoom = 16,
   defaultCenter = { latitude: 53.9049, longitude: 27.5609 },
   onAreaChange,
+  onZoomChange,
   ...props
 }) => {
   // Current size of the map's container element.
   const [containerSize, setContainerSize] = useState([0, 0]);
 
   // Current high-level state of the map.
-  const [zoom, setZoom] = useState(defaultZoom);
+  const [zoom, setZoom0] = useState(defaultZoom);
+  const setZoom = (zoom) => {
+    setZoom0(zoom);
+    onZoomChange && onZoomChange(zoom);
+  };
   const [center, setCenter] = useState(defaultCenter);
 
   const ignoreWheelUntil = useRef(0);
