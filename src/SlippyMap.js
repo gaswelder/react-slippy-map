@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ControlledSlippyMap } from "./ControlledSlippyMap";
 
 const containerStyle = {
@@ -10,17 +10,14 @@ const containerStyle = {
 
 export const SlippyMap = ({
   zoom = 16,
-  defaultCenter = { latitude: 53.9049, longitude: 27.5609 },
+  center = { latitude: 53.9049, longitude: 27.5609 },
+  onMove,
   onAreaChange,
   onWheel,
   ...props
 }) => {
-  // Current size of the map's container element.
   const [containerSize, setContainerSize] = useState([0, 0]);
-
-  const [center, setCenter] = useState(defaultCenter);
   const containerRef = useRef(null);
-
   useEffect(() => {
     const c = containerRef.current;
     // When the map is mounted, get its container and measure its size.
@@ -30,22 +27,13 @@ export const SlippyMap = ({
     setContainerSize([c.offsetWidth, c.offsetHeight]);
   }, [containerRef.current]);
 
-  const $onAreaChange = useCallback(
-    (area) => {
-      setCenter(area.center);
-      if (onAreaChange) {
-        onAreaChange(area);
-      }
-    },
-    [onAreaChange]
-  );
-
   return (
     <div style={containerStyle} ref={containerRef}>
       {containerRef.current && (
         <ControlledSlippyMap
           {...props}
-          onAreaChange={$onAreaChange}
+          onAreaChange={onAreaChange}
+          onMove={onMove}
           center={center}
           onWheel={onWheel}
           zoom={zoom}

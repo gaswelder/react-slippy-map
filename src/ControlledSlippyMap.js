@@ -14,6 +14,7 @@ export const ControlledSlippyMap = ({
   zoom,
   center,
   onAreaChange,
+  onMove,
   onWheel,
   onClick,
   children,
@@ -73,13 +74,12 @@ export const ControlledSlippyMap = ({
   // Preprocesses dragging events and calls the listener in the props.
   const $handleMove = useCallback(
     (event) => {
-      if (!onAreaChange) {
+      if (!onAreaChange && !onMove) {
         return;
       }
-      onAreaChange({
-        center: coordinatesAtOffset(center, zoom, -event.dx, -event.dy),
-        ...$area,
-      });
+      const newcenter = coordinatesAtOffset(center, zoom, -event.dx, -event.dy);
+      onMove && onMove(newcenter);
+      onAreaChange && onAreaChange({ center: newcenter, ...$area });
     },
     [onAreaChange, center, zoom, $area]
   );
