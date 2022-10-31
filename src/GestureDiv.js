@@ -77,10 +77,10 @@ export const GestureDiv = ({ onMove, onClick, onWheel, children }) => {
   return (
     <div
       ref={elementRef}
-      onMouseDown={$onMouseDown}
-      onMouseUp={$onMouseUp}
-      onMouseMove={$onMouseMove}
-      onMouseLeave={$onMouseUp}
+      onPointerDown={$onMouseDown}
+      onPointerUp={$onMouseUp}
+      onPointerMove={$onMouseMove}
+      onPointerLeave={$onMouseUp}
       onClick={$onClick}
       onDragStart={prevent}
       onWheel={onWheel}
