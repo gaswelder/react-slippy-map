@@ -1,4 +1,4 @@
-const TileSize = 256;
+export const TileSize = 256;
 
 /*
  * Returns radius of the Mercator cylinder
@@ -48,7 +48,7 @@ function getXY(point, zoom) {
 function getLatLon(xy, zoom) {
   return {
     latitude: getLat(xy[1], zoom),
-    longitude: getLon(xy[0], zoom)
+    longitude: getLon(xy[0], zoom),
   };
 }
 
