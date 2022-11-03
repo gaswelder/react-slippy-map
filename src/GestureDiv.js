@@ -2,12 +2,20 @@ import React, { useEffect, useRef, useCallback } from "react";
 
 const prevent = (e) => e.preventDefault();
 
-export const GestureDiv = ({ onMove, onClick, onWheel, children }) => {
+export const GestureDiv = ({
+  onMove,
+  onClick,
+  onPinch,
+  onWheel,
+  children,
+  style,
+}) => {
   const elementRef = useRef();
   const state = useRef({
     prevMousePos: [0, 0],
     mouseDown: false,
     dragStarted: false,
+    pinchDistance: 0,
   }).current;
 
   useEffect(() => {
@@ -74,17 +82,32 @@ export const GestureDiv = ({ onMove, onClick, onWheel, children }) => {
     [onClick]
   );
 
+  const dist = (t1, t2) =>
+    Math.sqrt((t1.pageX - t2.pageX) ** 2 + (t1.pageY - t2.pageY) ** 2);
+
   return (
     <div
+      style={style}
       ref={elementRef}
       onPointerDown={$onMouseDown}
       onPointerUp={$onMouseUp}
       onPointerMove={$onMouseMove}
       onPointerLeave={$onMouseUp}
+      onTouchStart={(e) => {
+        if (e.touches.length == 2) {
+          state.pinchDistance = dist(e.touches[0], e.touches[1]);
+        }
+      }}
+      onTouchMove={(e) => {
+        if (e.touches.length == 2) {
+          const d = state.pinchDistance;
+          state.pinchDistance = dist(e.touches[0], e.touches[1]);
+          onPinch && onPinch({ pinch: state.pinchDistance - d });
+        }
+      }}
       onClick={$onClick}
       onDragStart={prevent}
       onWheel={onWheel}
-      style={{ outline: "thin solid red" }}
     >
       {children}
     </div>

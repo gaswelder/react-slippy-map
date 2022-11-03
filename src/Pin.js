@@ -1,34 +1,25 @@
 import React from "react";
-import Projection from "./mercator";
-import report from "./report";
 import { Context } from "./Context";
+import Projection from "./mercator";
 
 // Generic container for any content that can be put on the map.
-export default function Pin(props) {
-  const { coords, children, ...rest } = props;
-
+export default function Pin({ coords, children, ...rest }) {
   return (
     <Context.Consumer>
-      {({ zoom, offset }) => {
-        if (!offset || !zoom) {
-          report.internalFault(
-            "the pin didn't receive offset or zoom properties"
-          );
-          return null;
-        }
-
-        // Get projection coordinates and subtract our coordinates offset.
-        let px = Projection.getX(coords.longitude, zoom) - offset.x;
-        let py = Projection.getY(coords.latitude, zoom) - offset.y;
-
-        let style = {
-          position: "absolute",
-          left: px + "px",
-          top: py + "px",
-        };
-
+      {({ zoom, halfSize, XC, YC }) => {
+        const x = Projection.getX(coords.longitude, zoom);
+        const y = Projection.getY(coords.latitude, zoom);
+        // X(C) - w/2 + left = x
+        // left = x + w/2 - X(C)
         return (
-          <div {...rest} style={style}>
+          <div
+            {...rest}
+            style={{
+              position: "absolute",
+              left: x + halfSize[0] - XC,
+              top: y + halfSize[1] - YC,
+            }}
+          >
             {children}
           </div>
         );
