@@ -42,13 +42,21 @@ function getY(lat, zoom) {
 }
 
 function getXY(point, zoom) {
-  return [getX(point.longitude, zoom), getY(point.latitude, zoom)];
+  const R = radius(zoom); // -180..180
+  const lambda = toRad(point.longitude); // -pi..pi
+  const phi = toRad(point.latitude); // -pi/2..pi/2
+  const x = R * (lambda + Math.PI);
+
+  // Add half the surface because we measure from zero.
+  // Invert because we measure from the top.
+  const y = R * (Math.PI - Math.log(Math.tan(phi / 2 + Math.PI / 4)));
+  return [x, y];
 }
 
-function getLatLon(xy, zoom) {
+function getLatLon([x, y], zoom) {
   return {
-    latitude: getLat(xy[1], zoom),
-    longitude: getLon(xy[0], zoom),
+    latitude: getLat(y, zoom),
+    longitude: getLon(x, zoom),
   };
 }
 

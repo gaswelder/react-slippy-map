@@ -14,6 +14,7 @@ export const SlippyMap = ({
   zoom = 16,
   center = { latitude: 53.9049, longitude: 27.5609 },
   onMove,
+  onMoveEnd,
   onPinch,
   onAreaChange,
   onWheel,
@@ -85,6 +86,26 @@ export const SlippyMap = ({
     [onAreaChange, center, zoom, $area]
   );
 
+  const $handleMoveEnd = useCallback(
+    (event) => {
+      // Current position.
+      const p1 = center;
+      const [x1, y1] = Projection.getXY(center, zoom);
+
+      // From the event we know that the previous move tick had dx and dy pixels
+      // worth of movement. If the next tick had the same speed, we'd end up at
+      // this position.
+      const [x2, y2] = [x1 - event.dx, y1 - event.dy];
+      const p2 = Projection.getLatLon([x2, y2], zoom);
+
+      // Send up the speed to the callback as dlat, dlon.
+      const dlat = p2.latitude - p1.latitude;
+      const dlon = p2.longitude - p1.longitude;
+      onMoveEnd && onMoveEnd({ speed: [dlat, dlon] });
+    },
+    [center, zoom, onMoveEnd]
+  );
+
   useEffect(() => {
     if (!onAreaChange) {
       return;
@@ -105,15 +126,15 @@ export const SlippyMap = ({
   const izoom = Math.round(zoom);
   const scaledTileSize = TileSize * Math.pow(2, zoom - izoom);
 
+  const [XC, YC] = Projection.getXY(center, zoom);
+
   // 256i + L + w/2 = X(C)
-  const XC = Projection.getX(center.longitude, zoom);
   const i = (XC - containerSize[0] / 2) / scaledTileSize;
   const L = XC - containerSize[0] / 2 - scaledTileSize * Math.floor(i);
   // N > (w+L)/S
   const N = Math.ceil((containerSize[0] + L) / scaledTileSize);
 
   // 256j + T + h/2 = Y(C)
-  const YC = Projection.getY(center.latitude, zoom);
   const j = (YC - containerSize[1] / 2) / scaledTileSize;
   const T = YC - containerSize[1] / 2 - scaledTileSize * Math.floor(j);
   // M > (h+T)/S
@@ -152,6 +173,7 @@ export const SlippyMap = ({
             {jrange.map((j) => (
               <>
                 {irange.map((i) => (
+                  // <div key={[i, j].join(",")}>{`${izoom}/${i}/${j}.png`}</div>
                   <img
                     key={[i, j].join(",")}
                     src={`${baseTilesUrl}/${izoom}/${i}/${j}.png`}
@@ -163,13 +185,14 @@ export const SlippyMap = ({
           <GestureDiv
             onClick={$handleClick}
             onMove={$handleMove}
+            onMoveEnd={$handleMoveEnd}
             onWheel={$handleWheel}
             onPinch={onPinch}
             style={{
               position: "absolute",
               inset: 0,
             }}
-          ></GestureDiv>
+          />
           <Context.Provider value={{ zoom, halfSize, XC, YC }}>
             {children}
           </Context.Provider>
@@ -179,18 +202,12 @@ export const SlippyMap = ({
   );
 };
 
-// Returns latitude and longitude corresponding to the point
-// at [x,y] pixels from the current map center.
-const coordinatesAtOffset = (center, zoom, x, y) => {
-  // Get coordinates of our center on the projection cylinder.
-  let lat1 = center.latitude;
-  let lon1 = center.longitude;
-  let mx = Projection.getX(lon1, zoom);
-  let my = Projection.getY(lat1, zoom);
-  // Apply the offset to the projection coordinates and get the
-  // corresponding latitude and longitude.
+// Returns latitude and longitude corresponding to the point at [dx,dy] pixels
+// from `center`.
+const coordinatesAtOffset = (center, zoom, dx, dy) => {
+  const [x, y] = Projection.getXY(center, zoom);
   return {
-    latitude: Projection.getLat(my + y, zoom),
-    longitude: Projection.getLon(mx + x, zoom),
+    latitude: Projection.getLat(y + dy, zoom),
+    longitude: Projection.getLon(x + dx, zoom),
   };
 };

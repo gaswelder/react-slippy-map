@@ -4,10 +4,10 @@ const prevent = (e) => e.preventDefault();
 
 export const GestureDiv = ({
   onMove,
+  onMoveEnd,
   onClick,
   onPinch,
   onWheel,
-  children,
   style,
 }) => {
   const elementRef = useRef();
@@ -16,6 +16,7 @@ export const GestureDiv = ({
     mouseDown: false,
     dragStarted: false,
     pinchDistance: 0,
+    dragSpeed: [0, 0],
   }).current;
 
   useEffect(() => {
@@ -33,11 +34,8 @@ export const GestureDiv = ({
       mouseDown: true,
       dragStarted: false,
       prevMousePos: [event.pageX, event.pageY],
+      dragSpeed: [0, 0],
     });
-  }, []);
-
-  const $onMouseUp = useCallback(() => {
-    state.mouseDown = false;
   }, []);
 
   const $onMouseMove = useCallback(
@@ -45,10 +43,8 @@ export const GestureDiv = ({
       if (!state.mouseDown) {
         return;
       }
-      const x = event.pageX;
-      const y = event.pageY;
-      const dx = x - state.prevMousePos[0];
-      const dy = y - state.prevMousePos[1];
+      state.dx = event.pageX - state.prevMousePos[0];
+      state.dy = event.pageY - state.prevMousePos[1];
 
       // Mousemove can occur during a legitimate click too.
       // To account for that we let some limited mousemove
@@ -57,20 +53,32 @@ export const GestureDiv = ({
       // If this is a dragging, call the onMove handler
       // and update our pixel tracking.
       if (state.dragStarted) {
-        onMove({ dx, dy });
-        state.prevMousePos = [x, y];
+        onMove({ dx: state.dx, dy: state.dy });
+        state.prevMousePos = [event.pageX, event.pageY];
       }
       // If the "gesture" is not yet qualified as dragging,
       // see if it already qualifies by looking if the mouse
       // has travalled far enough.
       else {
-        if (Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
+        if (Math.abs(state.dx) >= 5 || Math.abs(state.dy) >= 5) {
           state.dragStarted = true;
         }
       }
     },
     [onMove]
   );
+
+  const $onMouseUp = useCallback(() => {
+    if (!state.mouseDown) {
+      return;
+    }
+    state.mouseDown = false;
+    if (!state.dragStarted) {
+      return;
+    }
+    state.dragStarted = false;
+    onMoveEnd && onMoveEnd({ dx: state.dx, dy: state.dy });
+  }, [onMoveEnd]);
 
   const $onClick = useCallback(
     (event) => {
@@ -108,8 +116,6 @@ export const GestureDiv = ({
       onClick={$onClick}
       onDragStart={prevent}
       onWheel={onWheel}
-    >
-      {children}
-    </div>
+    ></div>
   );
 };
