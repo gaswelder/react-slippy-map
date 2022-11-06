@@ -38,9 +38,9 @@ Props:
 
 - required `baseTilesUrl` - for example,
   "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
-- `center`: `{ latitude:number, longitude:number }` - coordinates of the map
+- required `center`: `{ latitude:number, longitude:number }` - coordinates of the map
   center
-- `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider;
+- required `zoom` - zoom level, typically from 1 to 18, but depends on the tile provider;
   can be fractional (in that case the closest zoom's tiles are scaled to
   interpolate)
 - `children` - content like markers and boxes
@@ -51,21 +51,45 @@ Props:
 - `onWheel` - called with the wheel event as the argument when the user uses the
   mouse wheel
 
-If `center` is not set, the map starts at `defaultCenter` and takes care of controlling this prop itself.
-If `zoom` is not set, the map starts at `defaultZoom`, renders additionally zoom in/out buttons and controls the zoom itself.
-Additionally, `minZoom`, `maxZoom` and `zoomStep` props are taken into account by the zoom buttons.
+The map is fully controlled, there's no internal state, the host must always
+supply the position and zoom. An example with the container's state:
 
-## `Pin` - generic positioned container for any content
+```js
+const MyMap = () => {
+  const [center, setCenter] = useState({
+    latitude: 53.9049,
+    longitude: 27.5609,
+  });
+  const [zoom, setZoom] = useState(10);
+
+  return (
+    <div style={{ height: "500px" }}>
+      <SlippyMap
+        center={center}
+        zoom={zoom}
+        onAreaChange={(area) => {
+          setCenter(area.center);
+        }}
+        onWheel={(event) => {
+          const delta = event.deltaY > 0 ? -1 : 1;
+          setZoom((x) => x + delta);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+## `Pin` - generic positioned container for arbitrary content
 
 ```js
 import { SlippyMap, Pin } from "react-slippy-map";
 
 function MapWithUser(props) {
   return (
-    <SlippyMap>
+    <SlippyMap center={props.center} zoom={props.zoom}>
       <Pin coords={props.userCoords}>
         <div style={{ background: "white", padding: "1em" }}>You are here</div>
-        <UserMarker title="You are here" />
       </Pin>
     </SlippyMap>
   );
@@ -91,39 +115,6 @@ These are:
 The `up` property makes the label or infobox look "up" from the pin instead of default "down".
 
 `Marker`, `InfoBox` and `Label` pass any other properties down to the actual `div` that they render, so it's possible to assign event listeners to them.
-
-## Controlling the map state
-
-An example of controlling the map:
-
-```js
-import React from "react";
-import { SlippyMap } from "react-slippy-map";
-
-const MyMap = () => {
-  const [center, setCenter] = useState({
-    latitude: 53.9049,
-    longitude: 27.5609,
-  });
-  const [zoom, setZoom] = useState(10);
-
-  return (
-    <div style={{ height: "500px" }}>
-      <SlippyMap
-        center={center}
-        zoom={zoom}
-        onAreaChange={(area) => {
-          setCenter(area.center);
-        }}
-        onWheel={(event) => {
-          const delta = event.deltaY > 0 ? -1 : 1;
-          setZoom((x) => x + delta);
-        }}
-      />
-    </div>
-  );
-};
-```
 
 ## Clusters - groups objects into one and renders the groups
 
