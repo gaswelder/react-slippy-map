@@ -40,20 +40,25 @@ export const SlippyMap = ({
 
   // Object describing currently visible area in coordinates.
   const $area = useMemo(() => {
-    return {
-      leftTop: coordinatesAtOffset(center, zoom, -halfSize[0], -halfSize[1]),
-      rightBottom: coordinatesAtOffset(center, zoom, halfSize[0], halfSize[1]),
-    };
+    const [x, y] = Projection.getXY(center, zoom);
+    const leftTop = Projection.getLatLon(
+      [x - halfSize[0], y - halfSize[1]],
+      zoom
+    );
+    const rightBottom = Projection.getLatLon(
+      [x + halfSize[0], y + halfSize[1]],
+      zoom
+    );
+    return { leftTop, rightBottom };
   }, [center, zoom, halfSize[0], halfSize[1]]);
 
   const $eventCoords = useCallback(
     (event) => {
       const rect = containerRef.current.getBoundingClientRect();
-      const x = event.pageX - rect.x;
-      const y = event.pageY - rect.y;
-      const dx = x - halfSize[0];
-      const dy = y - halfSize[1];
-      return coordinatesAtOffset(center, zoom, dx, dy);
+      const dx = event.pageX - rect.x - halfSize[0];
+      const dy = event.pageY - rect.y - halfSize[1];
+      const [x, y] = Projection.getXY(center, zoom);
+      return Projection.getLatLon([x + dx, y + dy], zoom);
     },
     [containerRef.current, halfSize[0], halfSize[1], center, zoom]
   );
@@ -79,7 +84,11 @@ export const SlippyMap = ({
       if (!onAreaChange && !onMove) {
         return;
       }
-      const newcenter = coordinatesAtOffset(center, zoom, -event.dx, -event.dy);
+      const [x, y] = Projection.getXY(center, zoom);
+      const newcenter = Projection.getLatLon(
+        [x - event.dx, y - event.dy],
+        zoom
+      );
       onMove && onMove(newcenter);
       onAreaChange && onAreaChange({ center: newcenter, ...$area });
     },
@@ -200,14 +209,4 @@ export const SlippyMap = ({
       )}
     </div>
   );
-};
-
-// Returns latitude and longitude corresponding to the point at [dx,dy] pixels
-// from `center`.
-const coordinatesAtOffset = (center, zoom, dx, dy) => {
-  const [x, y] = Projection.getXY(center, zoom);
-  return {
-    latitude: Projection.getLat(y + dy, zoom),
-    longitude: Projection.getLon(x + dx, zoom),
-  };
 };

@@ -54,10 +54,18 @@ function getXY(point, zoom) {
 }
 
 function getLatLon([x, y], zoom) {
-  return {
-    latitude: getLat(y, zoom),
-    longitude: getLon(x, zoom),
-  };
+  const R = radius(zoom);
+
+  // Invert because we measure from top.
+  // Subtract half because we measure from zero.
+  const y1 = 2 * R * Math.PI - y - R * Math.PI;
+  const ky = y1 / R;
+  const latitude = toDeg(2 * (Math.atan(Math.exp(ky)) - Math.PI / 4));
+
+  const lambda = x / R - Math.PI; // -pi..pi
+  const longitude = toDeg(lambda);
+
+  return { latitude, longitude };
 }
 
 /*
@@ -65,15 +73,13 @@ function getLatLon([x, y], zoom) {
  * y-coordinate on the Mercator cylinder.
  */
 function getLat(y, zoom) {
-  let R = radius(zoom);
-
+  const R = radius(zoom);
   // Invert because we measure from top.
   // Subtract half because we measure from zero.
-  y = 2 * R * Math.PI - y;
-  y -= R * Math.PI;
-
-  let ky = y / R;
-  return toDeg(2 * (Math.atan(Math.exp(ky)) - Math.PI / 4));
+  const y1 = 2 * R * Math.PI - y - R * Math.PI;
+  const ky = y1 / R;
+  const latitude = toDeg(2 * (Math.atan(Math.exp(ky)) - Math.PI / 4));
+  return latitude;
 }
 
 /*
@@ -81,11 +87,10 @@ function getLat(y, zoom) {
  * x-coordinate on the Mercator cylinder.
  */
 function getLon(x, zoom) {
-  let R = radius(zoom);
-
-  let lambda = x / R; // 0..2pi
-  lambda -= Math.PI; // -pi..pi
-  return toDeg(lambda);
+  const R = radius(zoom);
+  const lambda = x / R - Math.PI; // -pi..pi
+  const longitude = toDeg(lambda);
+  return longitude;
 }
 
 function toDeg(rad) {
